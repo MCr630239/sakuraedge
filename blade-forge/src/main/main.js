@@ -851,6 +851,13 @@ ipcMain.handle('update:download', async (e, arg) => {
     }
     fs.mkdirSync(updDir(), { recursive: true });
     const dest = path.join(updDir(), 'BladeForge-update.zip');
+    // 秒装：上次已经下完（大小一致）就直接用，不重下
+    try {
+      const want = Number(meta.size || 0);
+      if (want > 0 && fs.existsSync(dest) && fs.statSync(dest).size === want) {
+        return { ok: true, path: dest, bytes: want, cached: true };
+      }
+    } catch (_) {}
     let lastEmit = 0, lastGot = 0, spd = 0;
     const onProg = (got, total) => {
       const now = Date.now();
@@ -870,18 +877,18 @@ ipcMain.handle('update:download', async (e, arg) => {
 });
 
 // 解压 zip 到临时目录，返回可覆盖的文件根目录
-async function stageZip(zipPath) {
+async function stageZip(zipPath, appDir, onProg) {
   // Electron 的 fs 代理会把任何 *.asar 当成包去解析，写 app.asar 时要用纯 fs
   const prevNoAsar = process.noAsar;
   process.noAsar = true;
   try {
-    return await stageZipInner(zipPath);
+    return await stageZipInner(zipPath, appDir, onProg);
   } finally {
     process.noAsar = prevNoAsar;
   }
 }
 
-async function stageZipInner(zipPath) {
+async function stageZipInner(zipPath, appDir, onProg) {
   const zip = await JSZip.loadAsync(fs.readFileSync(zipPath));
   const entries = Object.keys(zip.files);
   const exeEntry = entries.find((n) => /(^|\/)BladeForge\.exe$/i.test(n));
@@ -889,24 +896,33 @@ async function stageZipInner(zipPath) {
   const rootPrefix = exeEntry.slice(0, exeEntry.length - 'BladeForge.exe'.length);
   const stage = path.join(updDir(), 'stage-' + Date.now());
   fs.mkdirSync(stage, { recursive: true });
-  let count = 0;
+  // 增量解压：磁盘上已有的同尺寸文件直接跳过，只解真正变了的那几个（asar 等）
+  const canDiff = !!appDir && fs.existsSync(appDir);
+  let count = 0, skipped = 0, done = 0;
   for (const name of entries) {
     const entry = zip.files[name];
     const rel = rootPrefix && name.startsWith(rootPrefix) ? name.slice(rootPrefix.length) : name;
     if (!rel) continue;
-    const out = path.join(stage, rel);
-    if (entry.dir) {
-      fs.mkdirSync(out, { recursive: true });
-      continue;
+    done++;
+    if (onProg) onProg(done, entries.length, skipped);
+    if (entry.dir) { fs.mkdirSync(path.join(stage, rel), { recursive: true }); continue; }
+    const usz = entry._data && entry._data.uncompressedSize != null ? entry._data.uncompressedSize : -1;
+    if (canDiff && usz >= 0) {
+      try {
+        const cur = fs.statSync(path.join(appDir, rel));
+        if (cur.isFile() && cur.size === usz) { skipped++; continue; }
+      } catch (_) {}
     }
+    const out = path.join(stage, rel);
     fs.mkdirSync(path.dirname(out), { recursive: true });
     const buf = await entry.async('nodebuffer');
     fs.writeFileSync(out, buf);
     count++;
   }
   const exe = path.join(stage, 'BladeForge.exe');
-  if (!fs.existsSync(exe)) throw new Error('解压后没找到 BladeForge.exe');
-  return { stage, count, exe };
+  // 主程序同版本时会被跳过，此时沿用安装目录里已有的 exe
+  if (!fs.existsSync(exe) && !(appDir && fs.existsSync(path.join(appDir, 'BladeForge.exe')))) throw new Error('解压后没找到 BladeForge.exe');
+  return { stage, count, skipped, exe };
 }
 
 // 生成替换脚本：等本进程退出 → robocopy 覆盖 → 重启；全程写日志，失败留标记
@@ -930,7 +946,7 @@ function buildUpdateBat(stage, appDir) {
     '  goto wait',
     ')',
     'echo [copy] %DATE% %TIME% >>"%LOG%"',
-    'robocopy "%SRC%" "%DST%" /E /NFL /NDL /NJH /NJS /NP >>"%LOG%" 2>&1',
+    'robocopy "%SRC%" "%DST%" /E /MT:16 /R:1 /W:1 /NFL /NDL /NJH /NJS /NP >>"%LOG%" 2>&1',
     'if exist "%DST%\\BladeForge.exe" (',
     '  echo [ok] %DATE% %TIME% >>"%LOG%"',
     ') else (',
@@ -944,22 +960,29 @@ function buildUpdateBat(stage, appDir) {
   ].join('\r\n');
 }
 
-async function applyUpdateInstall(zipPath) {
+async function applyUpdateInstall(zipPath, sender) {
   try {
     if (!zipPath) return { ok: false, error: '没有更新包路径' };
+    let appDir = '';
+    try {
+      appDir = path.dirname(app.getPath('exe'));
+    } catch (e) {}
+    let lastEmit = 0;
+    const onProg = (done, total, skipped) => {
+      const now = Date.now();
+      if (now - lastEmit < 150 && done < total) return;
+      lastEmit = now;
+      try {
+        (sender || {}).send && sender.send('update:progress', { phase: 'extract', done, total, skipped, pct: total ? done / total : 0 });
+      } catch (_) {}
+    };
     let staged;
     try {
-      staged = await stageZip(zipPath);
+      staged = await stageZip(zipPath, appDir, onProg);
     } catch (e) {
       return { ok: false, error: '解压更新包失败：' + String((e && e.message) || e) };
     }
-    const { stage, count, exe } = staged;
-    let appDir;
-    try {
-      appDir = path.dirname(app.getPath('exe'));
-    } catch (e) {
-      return { ok: false, error: '拿不到当前安装目录：' + String((e && e.message) || e), stage, count };
-    }
+    const { stage, count, skipped, exe } = staged;
 
     if (process.platform !== 'win32') {
       return { ok: false, error: '自动替换目前只支持 Windows；更新包已解压在临时目录，可以手动替换', stage, count, appDir };
@@ -982,13 +1005,13 @@ async function applyUpdateInstall(zipPath) {
     const child = spawn('cmd.exe', ['/c', bat], { detached: true, stdio: 'ignore', windowsHide: false });
     child.unref();
     setTimeout(() => app.quit(), 800);
-    return { ok: true, count, appDir, stage, restart: true };
+    return { ok: true, count, skipped, appDir, stage, restart: true };
   } catch (err) {
     return { ok: false, error: String((err && err.message) || err) };
   }
 }
 
-ipcMain.handle('update:install', (_e, zipPath) => applyUpdateInstall(zipPath));
+ipcMain.handle('update:install', (e, zipPath) => applyUpdateInstall(zipPath, e.sender));
 
 ipcMain.handle('update:openLogDir', () => {
   const dir = path.join(os.tmpdir(), 'blade-forge-update');

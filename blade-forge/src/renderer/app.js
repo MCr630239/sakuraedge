@@ -1944,6 +1944,8 @@ const UPD = {
   lastGot: 0,
   installing: false,
   installed: null,
+  extract: null,
+  cached: false,
 };
 
 function updBytes(n) {
@@ -1995,11 +1997,20 @@ function updHtml() {
     status = '<div class="note">' + line + '</div>'
       + '<div style="height:6px;background:#15171b;border:1px solid #2a3340;border-radius:3px;overflow:hidden;margin:6px 0 10px">'
       + '<div style="height:6px;width:' + pct + '%;background:#3cd0c4"></div></div>';
-  } else if (UPD.installing) status = '<div class="note">正在解压更新包…</div>';
+  } else if (UPD.installing) {
+    const ex = UPD.extract;
+    const epct = ex ? Math.round((ex.pct || 0) * 100) : 0;
+    let line = '正在解压更新包…' + (ex ? ' ' + epct + '%' : '');
+    if (ex && ex.total) line += ' · ' + ex.done + ' / ' + ex.total + ' 个条目';
+    if (ex && ex.skipped) line += ' · 跳过 ' + ex.skipped + ' 个未变化文件';
+    status = '<div class="note">' + line + '</div>'
+      + '<div style="height:6px;background:#15171b;border:1px solid #2a3340;border-radius:3px;overflow:hidden;margin:6px 0 10px">'
+      + '<div style="height:6px;width:' + epct + '%;background:#f0a13c"></div></div>';
+  }
   else if (UPD.installed) {
     const r = UPD.installed;
     status = r.ok
-      ? '<div class="note" style="color:#8bd89a">已解压 ' + r.count + ' 个文件，' + (r.restart ? '建模器会自动退出并替换，然后重新启动' : '请手动替换') + '。目标目录：' + escapeHtml(r.appDir || '') + '</div>'
+      ? '<div class="note" style="color:#8bd89a">已解压 ' + r.count + ' 个文件' + (r.skipped ? '（跳过 ' + r.skipped + ' 个未变化）' : '') + '，' + (r.restart ? '建模器会自动退出并替换，然后重新启动' : '请手动替换') + '。目标目录：' + escapeHtml(r.appDir || '') + '</div>'
       : '<div class="note" style="color:#e8a07a">' + escapeHtml(r.error || '安装失败') + '</div>'
         + (r.stage ? '<div class="note">已解压到：' + escapeHtml(r.stage) + '</div>' : '');
   } else if (res) {
@@ -2050,7 +2061,13 @@ async function initUpd(silent) {
     msg('Blade Forge v' + (st.version || '') + ' · 就绪');
     if (window.api.onUpdateProgress) {
       window.api.onUpdateProgress((p) => {
-        if (!p || p.phase !== 'download') return;
+        if (!p) return;
+        if (p.phase === 'extract') {
+          UPD.extract = { done: p.done, total: p.total, pct: p.pct || 0, skipped: p.skipped || 0 };
+          if (!$('updModal').hidden) renderUpd();
+          return;
+        }
+        if (p.phase !== 'download') return;
         const now = Date.now();
         if (p.speed && isFinite(p.speed)) {
           UPD.speed = p.speed;
@@ -2107,6 +2124,7 @@ async function runUpdDownload(install) {
   if (!meta || !meta.url) { toast('更新清单里没有下载地址'); return; }
   UPD.downloading = true;
   UPD.pct = 0; UPD.got = 0; UPD.total = 0; UPD.speed = 0; UPD.lastT = 0; UPD.lastGot = 0;
+  UPD.extract = null;
   renderUpd();
   const dl = await window.api.updateDownload({ url: meta.url, assetApi: meta.assetApi || '' });
   UPD.downloading = false;
@@ -2115,7 +2133,7 @@ async function runUpdDownload(install) {
     renderUpd();
     return;
   }
-  toast('已下载 ' + updBytes(dl.bytes));
+  toast(dl.cached ? '更新包已在本地，直接用缓存安装（' + updBytes(dl.bytes) + '）' : '已下载 ' + updBytes(dl.bytes));
   if (!install) {
     UPD.installed = { ok: false, error: '只下载完成，文件在 ' + dl.path + '，可点「从 zip 安装…」选它' };
     renderUpd();
@@ -2128,6 +2146,7 @@ async function runUpdInstall(zipPath) {
   if (!zipPath) return;
   UPD.installing = true;
   UPD.installed = null;
+  UPD.extract = null;
   renderUpd();
   const r = await window.api.updateInstall(zipPath);
   UPD.installing = false;

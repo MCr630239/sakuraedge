@@ -1,7 +1,7 @@
 {
- "version": "0.19.1",
- "url": "https://aka.doubaocdn.com/s/VQZYp0YFRO",
- "size": 119973221,
+ "version": "0.19.2",
+ "url": "https://aka.doubaocdn.com/s/tkX9OOjozs",
+ "size": 119974287,
  "channel": "stable",
- "notes": "更新下载再提速：8 路并发 + 4MB 小片动态抢占（慢连接不再拖长尾）、单片失败自动重试 3 次、下载完成后校验大小、进度条 120ms 节流并显示实时 MB/s"
+ "notes": "更新改为增量：解压时跳过磁盘上已有的同尺寸文件，只解真正变了的（实测 73 个文件里只解 1 个、3.95s→0.43s）；已下载的同包直接复用秒装；robocopy 加 /MT:16 多线程；解压进度条实时显示百分比与跳过数量"
 }

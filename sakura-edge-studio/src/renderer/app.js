@@ -312,6 +312,7 @@ const state = {
     downloading: false,
     pct: 0,
     phase: '',
+    extract: null,
     installed: null,
   },
 };
@@ -1163,11 +1164,19 @@ function updateTab() {
     if (u.speed) line += ` · ${(u.speed / 1048576).toFixed(2)} MB/s`;
     status = `<p class="hint">${line}</p>
       <div style="height:6px;background:#1a2330;border-radius:3px;overflow:hidden;margin:6px 0 10px"><div style="height:6px;width:${pct}%;background:#e05a7a"></div></div>`;
-  } else if (u.installing) status = `<p class="hint">正在解压更新包…</p>`;
+  } else if (u.installing) {
+    const ex = u.extract;
+    const epct = ex ? Math.round((ex.pct || 0) * 100) : 0;
+    let line = `正在解压更新包… ${ex ? epct + '%' : ''}`;
+    if (ex && ex.total) line += ` · ${ex.done} / ${ex.total} 个条目`;
+    if (ex && ex.skipped) line += ` · 跳过 ${ex.skipped} 个未变化文件`;
+    status = `<p class="hint">${line}</p>
+      <div style="height:6px;background:#1a2330;border-radius:3px;overflow:hidden;margin:6px 0 10px"><div style="height:6px;width:${epct}%;background:#e05a7a"></div></div>`;
+  }
   else if (u.installed) {
     const r = u.installed;
     status = r.ok
-      ? `<p class="hint" style="color:#8bd89a">已解压 ${r.count} 个文件，${r.restart ? '工坊会自动退出并替换，然后重新启动' : '请手动替换'}。</p>
+      ? `<p class="hint" style="color:#8bd89a">已解压 ${r.count} 个文件${r.skipped ? '（跳过 ' + r.skipped + ' 个未变化）' : ''}，${r.restart ? '工坊会自动退出并替换，然后重新启动' : '请手动替换'}。</p>
          <p class="hint">目标目录：<span class="suffix">${esc(r.appDir || '')}</span></p>`
       : `<p class="hint" style="color:#e8a07a">${esc(r.error || '安装失败')}</p>
          ${r.stage ? `<p class="hint">已解压到：<span class="suffix">${esc(r.stage)}</span></p>` : ''}`;
@@ -1287,6 +1296,7 @@ async function updInstallPath(zipPath) {
   const u = state.upd;
   if (!zipPath) return;
   u.installing = true;
+  u.extract = null;
   u.installed = null;
   if (state.tab === 'update') renderInspector();
   const r = await window.api.updateInstall(zipPath);
@@ -1328,7 +1338,13 @@ async function initUpdate() {
     state.upd.autoCheck = st.autoCheck !== false;
     if (window.api.onUpdateProgress) {
       window.api.onUpdateProgress((p) => {
-        if (!p || p.phase !== 'download') return;
+        if (!p) return;
+        if (p.phase === 'extract') {
+          state.upd.extract = { done: p.done, total: p.total, pct: p.pct || 0, skipped: p.skipped || 0 };
+          updateTab();
+          return;
+        }
+        if (p.phase !== 'download') return;
         const now = Date.now();
         if (state.upd.lastT && now - state.upd.lastT > 250) {
           state.upd.speed = (p.got - state.upd.lastGot) / ((now - state.upd.lastT) / 1000);
