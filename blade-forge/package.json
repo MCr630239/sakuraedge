@@ -1,12 +1,15 @@
 {
   "name": "blade-forge",
   "productName": "BladeForge",
-  "version": "0.18.1",
+  "version": "0.18.2",
   "description": "Blade Forge - 拔刀剑参数化建模器（独立版）",
   "main": "src/main/main.js",
   "scripts": {
     "prepare": "node scripts/prepare.js",
     "start": "node scripts/prepare.js && electron .",
     "pack:win": "node scripts/prepare.js && electron-packager . BladeForge --platform=win32 --arch=x64 --electron-version=33.4.11 --out=dist --overwrite --prune=true --ignore=\"^(/dist|/.git)\""
+  },
+  "dependencies": {
+    "jszip": "^3.10.2"
   }
 }
