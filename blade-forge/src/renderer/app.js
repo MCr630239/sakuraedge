@@ -1583,6 +1583,32 @@ function updBytes(n) {
   return Math.round(v / 1024) + ' KB';
 }
 
+const FEEDBACK_REPO = 'https://github.com/MCr630239/sakuraedge';
+
+function feedbackIssueUrl() {
+  const info = UPD.info || {};
+  const body = [
+    '**问题 / 建议**',
+    '',
+    '',
+    '**复现步骤（如果是 bug）**',
+    '1. ',
+    '',
+    '**环境**',
+    `- Blade Forge v${info.version || '未知'}`,
+    `- 平台：${info.platform || '未知'}${info.packaged === false ? '（开发模式）' : ''}`,
+    '',
+    '**截图 / 日志 / 工程文件**',
+    '（可以直接拖进这个输入框）',
+  ].join('\n');
+  return `${FEEDBACK_REPO}/issues/new?title=${encodeURIComponent('【反馈】')}&body=${encodeURIComponent(body)}`;
+}
+
+function openFeedback() {
+  if (!window.api || !window.api.openUrl) { toast('当前环境不支持外链', true); return; }
+  window.api.openUrl(feedbackIssueUrl());
+}
+
 function updHtml() {
   const info = UPD.info || {};
   const res = UPD.result;
@@ -1625,6 +1651,7 @@ function updHtml() {
     + '<button class="primary" data-upd="check">立即检查</button>'
     + '<button class="ghost" data-upd="zip">从 zip 安装…</button>'
     + '<button class="ghost" data-upd="logdir">日志</button>'
+    + '<button class="ghost" data-upd="feedback">反馈 / 提建议</button>'
     + '<label style="display:flex;gap:6px;align-items:center;margin-left:auto;color:#9fb0c4"><input type="checkbox" data-upd-auto="1" ' + (UPD.autoCheck ? 'checked' : '') + ' /> 启动自动检查</label>'
     + '</div>'
     + '<div class="note">GitHub 源写法 <b>github:名字/仓库</b>，固定某个版本用 <b>github:名字/仓库@v0.18.1</b>。发版约定：tag 用 v0.18.1，附件名 <b>BladeForge-0.18.1-Windows-x64.zip</b>。</div>'
@@ -1724,6 +1751,11 @@ $('btnUpd').addEventListener('click', async () => {
   if (!UPD.info) await initUpd(false);
   renderUpd();
 });
+
+$('btnFb').addEventListener('click', async () => {
+  if (!UPD.info) await initUpd(false);
+  openFeedback();
+});
 $('updClose').addEventListener('click', () => { $('updModal').hidden = true; });
 
 $('updBody').addEventListener('click', async (e) => {
@@ -1748,6 +1780,8 @@ $('updBody').addEventListener('click', async (e) => {
   if (how === 'download') { runUpdDownload(true); return; }
   if (how === 'downloadonly') { runUpdDownload(false); return; }
   if (how === 'logdir') { window.api.updateOpenLogDir(); return; }
+  if (how === 'feedback') { openFeedback(); return; }
+  if (how === 'issues') { if (window.api.openUrl) window.api.openUrl(FEEDBACK_REPO + '/issues'); return; }
 });
 
 $('updBody').addEventListener('change', async (e) => {

@@ -1,0 +1,48 @@
+name: 问题反馈
+description: 报告使用樱刃工坊 / Blade Forge 时遇到的 bug 或异常
+title: "【问题】"
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢反馈。请尽量把版本、复现步骤和截图写清楚，方便定位问题。
+        版本号可以在「更新」页（工坊）或顶栏（建模器）看到。
+  - type: dropdown
+    id: app
+    attributes:
+      label: 出问题的工具
+      options:
+        - 樱刃工坊 SakuraEdge Studio
+        - Blade Forge 建模器
+        - 前置模组 / 资源包
+        - 不确定
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: 版本
+      placeholder: 例如 1.14.3 / 0.18.1
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: 具体现象
+      description: 发生了什么，预期是什么
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: 复现步骤
+      placeholder: "1. 打开…\n2. 点击…\n3. 然后报错…"
+    validations:
+      required: true
+  - type: textarea
+    id: extra
+    attributes:
+      label: 截图 / 日志 / 工程文件
+      description: 截图可以直接粘贴，导出的工程或日志也可以拖进来
+    validations:
+      required: false

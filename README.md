@@ -76,6 +76,16 @@ scripts/release.sh 1.14.3 0.18.1 /home/user/Doubao/chats/38456044449975554
 
 更新流程：下载 zip → 解压到临时目录 → 校验包内有对应 exe → 生成替换脚本 → 程序退出 → `robocopy` 覆盖安装目录 → 自动重启。替换日志写在系统临时目录的 `blade-forge-update` / `sakura-edge-update` 里，失败会留标记，下次启动时提示。
 
+## 反馈与建议
+
+两个程序里都留了反馈入口，点一下直接打开 GitHub Issues 新建页：
+
+- 工坊：右侧「更新」页 → 「遇到问题 / 提建议」
+- 建模器：顶栏「反馈」按钮，或「更新」弹窗里的「反馈 / 提建议」
+
+新建页会自动带上当前版本和运行平台，截图、导出的工程、日志都能直接贴进去。
+也可以在 [Issues](https://github.com/MCr630239/sakuraedge/issues) 里看看别人提过什么。
+
 ## 目录结构
 
 ```text

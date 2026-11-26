@@ -1,10 +1,10 @@
 {
   "name": "sakura-edge-studio",
   "productName": "SakuraEdgeStudio",
-  "version": "1.14.2",
+  "version": "1.14.3",
   "description": "拔刀剑自定义工坊 —— 可视化编辑并一键导出 SlashBlade: Resharped 1.20.1 附属包",
   "main": "src/main/main.js",
-  "author": "Sakura Edge Studio",
+  "author": "Doubao",
   "license": "MIT",
   "scripts": {
     "prepare-assets": "node scripts/prepare.js",

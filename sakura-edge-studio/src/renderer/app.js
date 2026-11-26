@@ -1126,6 +1126,27 @@ function fmtBytes(n) {
   return Math.round(v / 1024) + ' KB';
 }
 
+const FEEDBACK_REPO = 'https://github.com/MCr630239/sakuraedge';
+
+function feedbackUrl() {
+  const info = (state.upd && state.upd.info) || {};
+  const body = [
+    '**问题 / 建议**',
+    '',
+    '',
+    '**复现步骤（如果是 bug）**',
+    '1. ',
+    '',
+    '**环境**',
+    `- 樱刃工坊 v${info.version || '未知'}`,
+    `- 平台：${info.platform || '未知'}${info.packaged === false ? '（开发模式）' : ''}`,
+    '',
+    '**截图 / 日志 / 工程文件**',
+    '（可以直接拖进这个输入框）',
+  ].join('\n');
+  return `${FEEDBACK_REPO}/issues/new?title=${encodeURIComponent('【反馈】')}&body=${encodeURIComponent(body)}`;
+}
+
 function updateTab() {
   const u = state.upd;
   const info = u.info || {};
@@ -1172,6 +1193,11 @@ function updateTab() {
     </div>
     <p class="hint">自动更新只支持 Windows 正式版：下载 zip → 解压到临时目录 → 等工坊退出后覆盖安装目录 → 自动重启。</p>
     <p class="hint">建议把工坊解压在普通文件夹（例如 <span class="suffix">D:\Tools\SakuraEdgeStudio</span>）。装在 <span class="suffix">Program Files</span> 这类受保护目录时，替换需要以管理员身份运行。</p>
+    <div class="row" style="display:flex;gap:8px;margin:10px 0 6px">
+      <button class="chip active" data-upd="feedback">遇到问题 / 提建议</button>
+      <button class="chip" data-upd="issues">查看已有反馈</button>
+    </div>
+    <p class="hint">打开的是 GitHub Issues 新建页，标题和正文会自动带上版本与系统信息；截图、导出的工程、日志都能直接贴进去。</p>
   </div>
   <div class="group">
     <div class="group-title">更新源</div>
@@ -1453,6 +1479,8 @@ tabBody.addEventListener('click', (e) => {
     if (how === 'download') { updDownloadAndInstall(true); return; }
     if (how === 'downloadonly') { updDownloadAndInstall(false); return; }
     if (how === 'logdir') { window.api.updateOpenLogDir(); return; }
+    if (how === 'feedback') { window.api.openUrl(feedbackUrl()); return; }
+    if (how === 'issues') { window.api.openUrl(FEEDBACK_REPO + '/issues'); return; }
   }
   const cell = e.target.closest('[data-cell]');
   if (cell) {

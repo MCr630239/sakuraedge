@@ -15,6 +15,7 @@ contextBridge.exposeInMainWorld('api', {
   exportPacks: (project) => ipcRenderer.invoke('export:packs', project),
   exportSplit: (project) => ipcRenderer.invoke('export:split', project),
   openPath: (p) => ipcRenderer.invoke('shell:open', p),
+  openUrl: (url) => ipcRenderer.invoke('shell:openUrl', url),
   updateState: () => ipcRenderer.invoke('update:state'),
   updateSave: (patch) => ipcRenderer.invoke('update:save', patch),
   updateCheck: (source) => ipcRenderer.invoke('update:check', source),

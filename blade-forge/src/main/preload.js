@@ -12,6 +12,7 @@ contextBridge.exposeInMainWorld('api', {
   pickObj: () => ipcRenderer.invoke('obj:pick'),
   readObj: (p) => ipcRenderer.invoke('obj:read', p),
   info: () => ipcRenderer.invoke('app:info'),
+  openUrl: (url) => ipcRenderer.invoke('shell:openUrl', url),
   updateState: () => ipcRenderer.invoke('update:state'),
   updateSave: (patch) => ipcRenderer.invoke('update:save', patch),
   updateCheck: (source) => ipcRenderer.invoke('update:check', source),

@@ -411,7 +411,18 @@ ipcMain.handle('export:split', async (_e, project) => {
 
 ipcMain.handle('shell:open', (_e, target) => shell.openPath(target));
 
+/* 只允许打开本项目的 GitHub 页面，避免被任意 URL 利用 */
+const ALLOWED_URL_PREFIXES = ['https://github.com/MCr630239/', 'https://www.bilibili.com/'];
+ipcMain.handle('shell:openUrl', (_e, url) => {
+  const u = String(url || '');
+  if (!ALLOWED_URL_PREFIXES.some((p) => u.startsWith(p))) return false;
+  shell.openExternal(u);
+  return true;
+});
+
 /* ---------- 自动更新 ---------- */
+/* 官方更新源：本项目的公开仓库，客户端默认就填这个 */
+const DEFAULT_UPDATE_SOURCE = 'github:MCr630239/sakuraedge';
 const os = require('os');
 const http = require('http');
 const https = require('https');
@@ -635,7 +646,7 @@ ipcMain.handle('update:state', () => {
     version: app.getVersion(),
     platform: process.platform,
     packaged: app.isPackaged,
-    source: cfg.source || '',
+    source: cfg.source || DEFAULT_UPDATE_SOURCE,
     autoCheck: cfg.autoCheck !== false,
     lastCheck: cfg.lastCheck || 0,
   };

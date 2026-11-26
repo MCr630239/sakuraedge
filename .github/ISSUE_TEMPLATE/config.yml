@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 下载与更新
+    url: https://github.com/MCr630239/sakuraedge/releases
+    about: 最新版本、历史版本的安装包都在这里
+  - name: 使用说明
+    url: https://github.com/MCr630239/sakuraedge/blob/main/docs/使用说明.md
+    about: 建模、出配方、导入游戏的完整流程
