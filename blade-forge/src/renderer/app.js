@@ -2017,10 +2017,12 @@ function updHtml() {
     if (!res.ok) status = '<div class="note" style="color:#e88484">检查失败：' + escapeHtml(res.error || '未知错误') + '</div>';
     else if (res.newer) {
       status = '<div style="color:#8bd89a;font-weight:600;margin:8px 0 4px">发现新版本 v' + escapeHtml(meta.version) + '（当前 v' + escapeHtml(res.current) + '）</div>'
-        + '<div class="note">更新包：' + updBytes(meta.size) + (meta.channel ? ' · ' + escapeHtml(meta.channel) : '') + (meta.via === 'github' ? ' · GitHub' : '') + '</div>'
+        + ((meta.delta && meta.delta.from === res.current)
+          ? '<div class="note" style="color:#8bd89a">增量更新：只需 ' + updBytes(meta.delta.size) + '（比整包 ' + updBytes(meta.size) + ' 少 ' + updBytes(Math.max(0, meta.size - meta.delta.size)) + '）</div>'
+          : '<div class="note">更新包：' + updBytes(meta.size) + (meta.channel ? ' · ' + escapeHtml(meta.channel) : '') + (meta.via === 'github' ? ' · GitHub' : '') + '</div>')
         + (meta.notes ? '<div class="note" style="white-space:pre-wrap;max-height:180px;overflow:auto;border:1px solid #2a3340;border-radius:4px;padding:6px 8px;margin:6px 0">' + escapeHtml(meta.notes) + '</div>' : '')
         + '<div class="row" style="display:flex;gap:8px;margin:8px 0">'
-        + '<button class="primary" data-upd="download">下载并安装</button>'
+        + '<button class="primary" data-upd="download">' + ((meta.delta && meta.delta.from === res.current) ? '增量更新并安装' : '下载并安装') + '</button>'
         + '<button class="ghost" data-upd="downloadonly">只下载</button></div>';
     } else {
       status = '<div style="color:#8bd89a;margin:8px 0">已是最新版本 v' + escapeHtml(res.current) + '</div>';
@@ -2133,7 +2135,7 @@ async function runUpdDownload(install) {
     renderUpd();
     return;
   }
-  toast(dl.cached ? '更新包已在本地，直接用缓存安装（' + updBytes(dl.bytes) + '）' : '已下载 ' + updBytes(dl.bytes));
+  toast((dl.delta ? '增量' : '') + (dl.cached ? '更新包已在本地，直接用缓存安装（' : '已下载 ') + updBytes(dl.bytes) + (dl.cached ? '）' : ''));
   if (!install) {
     UPD.installed = { ok: false, error: '只下载完成，文件在 ' + dl.path + '，可点「从 zip 安装…」选它' };
     renderUpd();

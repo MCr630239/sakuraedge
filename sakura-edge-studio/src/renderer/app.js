@@ -1184,10 +1184,12 @@ function updateTab() {
     if (!res.ok) status = `<p class="hint" style="color:#e88484">检查失败：${esc(res.error || '未知错误')}</p>`;
     else if (res.newer) {
       status = `<p style="color:#8bd89a;font-weight:600">发现新版本 v${esc(meta.version)}（当前 v${esc(res.current)}）</p>
-        <p class="hint">更新包：${fmtBytes(meta.size)}${meta.channel ? ' · ' + esc(meta.channel) : ''}</p>
+        ${(meta.delta && meta.delta.from === res.current)
+          ? `<p class="hint" style="color:#8bd89a">增量更新：只需 ${fmtBytes(meta.delta.size)}（比整包 ${fmtBytes(meta.size)} 少 ${fmtBytes(Math.max(0, meta.size - meta.delta.size))}）</p>`
+          : `<p class="hint">更新包：${fmtBytes(meta.size)}${meta.channel ? ' · ' + esc(meta.channel) : ''}</p>`}
         ${meta.notes ? `<p class="hint" style="white-space:pre-wrap">${esc(meta.notes)}</p>` : ''}
         <div class="row" style="display:flex;gap:8px;margin:10px 0">
-          <button class="chip active" data-upd="download">下载并安装</button>
+          <button class="chip active" data-upd="download">${(meta.delta && meta.delta.from === res.current) ? '增量更新并安装' : '下载并安装'}</button>
           <button class="chip" data-upd="downloadonly">只下载</button>
         </div>`;
     } else {

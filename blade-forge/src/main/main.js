@@ -757,6 +757,17 @@ async function checkByList(src, cfg) {
       notes: String(meta.notes || ''),
       sha256: String(meta.sha256 || ''),
       channel: String(meta.channel || 'stable'),
+      delta: (() => {
+        // 支持 delta 与 deltas 数组：清单可同时挂多个"从哪版升到哪版"的差异包
+        const cands = [];
+        if (meta.delta && meta.delta.url) cands.push(meta.delta);
+        if (Array.isArray(meta.deltas)) for (const d of meta.deltas) if (d && d.url) cands.push(d);
+        const pick = cands.find((d) => String(d.from || '') === app.getVersion()) || null;
+        if (!pick) return null;
+        let u = String(pick.url);
+        if (!/^https?:|^file:/i.test(u)) u = new URL(u, src).toString();
+        return { from: String(pick.from || ''), url: u, size: Number(pick.size || 0), notes: String(pick.notes || '') };
+      })(),
     },
   };
 }
@@ -841,7 +852,13 @@ ipcMain.handle('update:download', async (e, arg) => {
     // 私有仓库的附件必须走 API 并带 token；公开仓库用浏览器地址就行
     let url = meta.url;
     let headers = null;
-    if (token && meta.assetApi && /api\.github\.com/i.test(meta.assetApi)) {
+    // 增量包：清单里给了 from=当前版本 的差异包，就只下变了的那些文件
+    let isDelta = false;
+    if (meta.delta && meta.delta.url && String(meta.delta.from || '') === app.getVersion()) {
+      url = meta.delta.url;
+      isDelta = true;
+    }
+    if (!isDelta && token && meta.assetApi && /api\.github\.com/i.test(meta.assetApi)) {
       url = meta.assetApi;
       headers = {
         Authorization: 'Bearer ' + token,
@@ -850,12 +867,12 @@ ipcMain.handle('update:download', async (e, arg) => {
       };
     }
     fs.mkdirSync(updDir(), { recursive: true });
-    const dest = path.join(updDir(), 'BladeForge-update.zip');
+    const dest = path.join(updDir(), 'BladeForge-update' + (isDelta ? '-delta' : '') + '.zip');
     // 秒装：上次已经下完（大小一致）就直接用，不重下
     try {
-      const want = Number(meta.size || 0);
+      const want = Number(isDelta ? ((meta.delta && meta.delta.size) || 0) : (meta.size || 0));
       if (want > 0 && fs.existsSync(dest) && fs.statSync(dest).size === want) {
-        return { ok: true, path: dest, bytes: want, cached: true };
+        return { ok: true, path: dest, bytes: want, cached: true, delta: isDelta };
       }
     } catch (_) {}
     let lastEmit = 0, lastGot = 0, spd = 0;
@@ -869,12 +886,37 @@ ipcMain.handle('update:download', async (e, arg) => {
         e.sender.send('update:progress', { phase: 'download', got, total, pct: total ? got / total : 0, speed: spd });
       } catch (_) {}
     };
-    const bytes = headers ? await downloadTo(url, dest, onProg) : await downloadFast(url, dest, onProg);
-    return { ok: true, path: dest, bytes };
+    let bytes;
+    try {
+      bytes = headers ? await downloadTo(url, dest, onProg) : await downloadFast(url, dest, onProg);
+    } catch (err) {
+      // 增量包下砸了就退回整包，别让用户卡住
+      if (isDelta) {
+        isDelta = false;
+        const full = path.join(updDir(), 'BladeForge-update.zip');
+        bytes = await downloadFast(meta.url, full, onProg);
+        return { ok: true, path: full, bytes, delta: false, fallback: true };
+      }
+      throw err;
+    }
+    return { ok: true, path: dest, bytes, delta: isDelta };
   } catch (err) {
     return { ok: false, error: String((err && err.message) || err) };
   }
 });
+
+// 流式 CRC32：小文件比对内容用，避免"大小相同但内容不同"漏更新
+function crc32File(p) {
+  return new Promise((resolve, reject) => {
+    let crc = -1;
+    const rs = fs.createReadStream(p);
+    rs.on('data', (b) => {
+      for (let i = 0; i < b.length; i++) crc = (crc >>> 8) ^ CRC_TABLE[(crc ^ b[i]) & 0xff];
+    });
+    rs.on('end', () => resolve((crc ^ -1) >>> 0));
+    rs.on('error', reject);
+  });
+}
 
 // 解压 zip 到临时目录，返回可覆盖的文件根目录
 async function stageZip(zipPath, appDir, onProg) {
@@ -892,8 +934,15 @@ async function stageZipInner(zipPath, appDir, onProg) {
   const zip = await JSZip.loadAsync(fs.readFileSync(zipPath));
   const entries = Object.keys(zip.files);
   const exeEntry = entries.find((n) => /(^|\/)BladeForge\.exe$/i.test(n));
-  if (!exeEntry) throw new Error('这个 zip 里没有 BladeForge.exe，不像是建模器的更新包');
-  const rootPrefix = exeEntry.slice(0, exeEntry.length - 'BladeForge.exe'.length);
+  // 增量包只含变了的文件，可能不含主程序；没有 exe 时按第一层目录推前缀
+  let rootPrefix = '';
+  if (exeEntry) {
+    rootPrefix = exeEntry.slice(0, exeEntry.length - 'BladeForge.exe'.length);
+  } else {
+    const first = entries.find((n) => n.includes('/')) || '';
+    const idx = first.indexOf('/');
+    rootPrefix = idx > 0 ? first.slice(0, idx + 1) : '';
+  }
   const stage = path.join(updDir(), 'stage-' + Date.now());
   fs.mkdirSync(stage, { recursive: true });
   // 增量解压：磁盘上已有的同尺寸文件直接跳过，只解真正变了的那几个（asar 等）
@@ -907,10 +956,15 @@ async function stageZipInner(zipPath, appDir, onProg) {
     if (onProg) onProg(done, entries.length, skipped);
     if (entry.dir) { fs.mkdirSync(path.join(stage, rel), { recursive: true }); continue; }
     const usz = entry._data && entry._data.uncompressedSize != null ? entry._data.uncompressedSize : -1;
+    const crc = entry._data && entry._data.crc32 != null ? entry._data.crc32 : -1;
     if (canDiff && usz >= 0) {
       try {
-        const cur = fs.statSync(path.join(appDir, rel));
-        if (cur.isFile() && cur.size === usz) { skipped++; continue; }
+        const fp = path.join(appDir, rel);
+        const cur = fs.statSync(fp);
+        if (cur.isFile() && cur.size === usz) {
+          // 大文件（主程序 exe）只比大小：同版本 Electron 的壳功能一致，读 180MB 不划算
+          if (usz > 32 * 1048576 || crc < 0 || (await crc32File(fp)) === crc) { skipped++; continue; }
+        }
       } catch (_) {}
     }
     const out = path.join(stage, rel);

@@ -1,7 +1,10 @@
 {
- "version": "1.14.14",
- "url": "https://aka.doubaocdn.com/s/qdC72suWsv",
- "size": 116879139,
+ "version": "1.14.16",
+ "url": "https://aka.doubaocdn.com/s/HSqxHUJWGm",
+ "size": 116880923,
  "channel": "stable",
- "notes": "与 Blade Forge 0.19.2 配套；增量解压、秒装复用、多线程覆盖同步到位"
+ "notes": "与 Blade Forge 0.19.4 配套；同样支持增量更新（从 1.14.15 升只需 1.7MB）",
+ "deltas": [
+  { "from": "1.14.15", "url": "https://aka.doubaocdn.com/s/6H31t8yICY", "size": 1778268 }
+ ]
 }
