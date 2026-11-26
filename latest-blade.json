@@ -1,7 +1,7 @@
 {
- "version": "0.18.9",
- "url": "https://aka.doubaocdn.com/s/p37LjIoaaJ",
- "size": 119972213,
+ "version": "0.19.0",
+ "url": "https://aka.doubaocdn.com/s/24ScW4w94k",
+ "size": 119972641,
  "channel": "stable",
- "notes": "方块可自由放到任意位置（X/Y/Z 三轴滑杆 + 视口拖动）；新增视图「居中」按钮与 Home 键，模型被平移出视野会提示"
+ "notes": "方块改亮橙色、默认放大到 24x20x14 并凸出刀身外侧（原来被刀身包住看不见），加亮黄描边；wine 10 实机测试通过"
 }
