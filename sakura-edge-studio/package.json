@@ -1,0 +1,24 @@
+{
+  "name": "sakura-edge-studio",
+  "productName": "SakuraEdgeStudio",
+  "version": "1.14.2",
+  "description": "拔刀剑自定义工坊 —— 可视化编辑并一键导出 SlashBlade: Resharped 1.20.1 附属包",
+  "main": "src/main/main.js",
+  "author": "Sakura Edge Studio",
+  "license": "MIT",
+  "scripts": {
+    "prepare-assets": "node scripts/prepare.js",
+    "start": "node scripts/prepare.js && electron .",
+    "pack:win": "node scripts/prepare.js && electron-packager . SakuraEdgeStudio --platform=win32 --arch=x64 --out=dist --overwrite --icon=assets/icon.ico --prune=true --ignore=\"^(/dist|/tools|/.git)\"",
+    "pack:linux": "node scripts/prepare.js && electron-packager . SakuraEdgeStudio --platform=linux --arch=x64 --out=dist --overwrite --prune=true"
+  },
+  "dependencies": {
+    "jszip": "^3.10.2"
+  },
+  "devDependencies": {
+    "@electron/packager": "^20.3.0",
+    "electron": "^33.4.11",
+    "esbuild": "^0.28.2",
+    "three": "^0.187.0"
+  }
+}

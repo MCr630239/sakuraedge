@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<title>樱刃工坊 · Sakura Edge Studio</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div id="app">
+  <header class="titlebar">
+    <div class="brand">
+      <div class="mark">刃</div>
+      <div class="brand-text">
+        <h1>樱刃工坊</h1>
+        <small>Sakura Edge Studio · 拔刀剑自定义</small>
+      </div>
+    </div>
+    <div class="proj">
+      <div class="field"><label>工程名</label><input id="projName" spellcheck="false" /></div>
+      <div class="field"><label>命名空间</label><input id="projNs" spellcheck="false" /></div>
+      <div class="field short"><label>版本</label><input id="projVer" spellcheck="false" /></div>
+    </div>
+    <div class="actions">
+      <button id="btnOpen" class="ghost">打开工程</button>
+      <button id="btnSave" class="ghost">保存</button>
+      <button id="btnCheck" class="ghost">工程体检</button>
+      <button id="btnSplit" class="ghost">分刀出包</button>
+      <button id="btnExport" class="accent">导出 jar</button>
+    </div>
+  </header>
+
+  <main>
+    <aside class="sidebar">
+      <div class="side-head">
+        <span>刀库</span>
+        <span class="count" id="bladeCount">0</span>
+      </div>
+      <ul id="bladeList" class="blade-list"></ul>
+      <div class="side-foot">
+        <button id="btnNewBlade" class="accent small">＋ 新建刀</button>
+        <button id="btnDup" class="ghost small">复制</button>
+        <button id="btnDel" class="ghost small danger">删除</button>
+      </div>
+      <div class="side-extra">
+        <button id="btnImportProj" class="link">从 .ses 工程导入</button>
+        <button id="btnExportPacks" class="link">导出资源包 + 数据包</button>
+      </div>
+    </aside>
+
+    <section class="stage">
+      <canvas id="view"></canvas>
+      <div class="stage-top">
+        <div class="chip-group" id="modeGroup">
+          <button data-mode="icon" class="chip active">物品栏姿态</button>
+          <button data-mode="hand" class="chip">手持姿态</button>
+          <button data-mode="back" class="chip">角色背负</button>
+        </div>
+        <div class="chip-group">
+          <button id="btnSpin" class="chip active">自动旋转</button>
+          <button id="btnResetCam" class="chip">重置视角</button>
+        </div>
+      </div>
+      <div class="stage-hint">拖拽旋转 · 滚轮缩放</div>
+      <div class="pose-panel" id="posePanel" hidden>
+        <div class="pose-head">背负挂点微调<span id="poseType">KATANA</span></div>
+        <div class="pose-row">
+          <label>X</label><input type="range" data-pose="x" min="-0.9" max="0.9" step="0.01" />
+          <label>Y</label><input type="range" data-pose="y" min="-1.2" max="1.2" step="0.01" />
+          <label>Z</label><input type="range" data-pose="z" min="-0.9" max="0.5" step="0.01" />
+        </div>
+        <div class="pose-row">
+          <label>RX</label><input type="range" data-pose="rx" min="-3.14" max="3.14" step="0.01" />
+          <label>RY</label><input type="range" data-pose="ry" min="-3.14" max="3.14" step="0.01" />
+          <label>RZ</label><input type="range" data-pose="rz" min="-3.14" max="3.14" step="0.01" />
+        </div>
+        <div class="pose-row">
+          <label>L</label><input type="range" data-pose="scale" min="0.3" max="1.5" step="0.01" />
+          <span class="pose-len" id="poseLen"></span>
+        </div>
+        <div class="pose-foot">
+          <span class="pose-nums" id="poseNums"></span>
+          <button class="link" id="poseReset">恢复默认</button>
+        </div>
+      </div>
+      <div class="stage-meta" id="stageMeta"></div>
+      <div class="stage-title" id="stageTitle"></div>
+    </section>
+
+    <aside class="inspector">
+      <nav class="tabs" id="tabs">
+        <button data-tab="base" class="active">基础</button>
+        <button data-tab="stats">属性</button>
+        <button data-tab="render">渲染</button>
+        <button data-tab="recipe">配方</button>
+        <button data-tab="check">校验</button>
+        <button data-tab="doc">设定</button>
+        <button data-tab="update">更新</button>
+      </nav>
+      <div class="tab-body" id="tabBody"></div>
+    </aside>
+  </main>
+
+  <footer class="statusbar">
+    <span id="statusText">就绪</span>
+    <span id="statusRight"></span>
+  </footer>
+</div>
+<div id="toast" class="toast"></div>
+<script>
+  window.addEventListener('error', function (ev) {
+    var s = document.getElementById('statusText');
+    if (s) s.textContent = 'JS 错误: ' + (ev.message || '') + ' @ ' + (ev.filename || '').split('/').pop() + ':' + (ev.lineno || '');
+    if (ev.error) console.error('[inline]', ev.error);
+  });
+  window.addEventListener('unhandledrejection', function (ev) {
+    var s = document.getElementById('statusText');
+    if (s) s.textContent = '异步错误: ' + (ev.reason && ev.reason.message ? ev.reason.message : ev.reason);
+  });
+</script>
+<script src="bundle.js"></script>
+</body>
+</html>

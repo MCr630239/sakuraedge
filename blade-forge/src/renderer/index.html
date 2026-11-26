@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<title>Blade Forge · 拔刀剑建模器</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<header class="topbar">
+  <div class="brand"><span class="logo">▮</span><b>Blade Forge</b><em>拔刀剑建模器 <span id="brandVer">0.18.0</span></em></div>
+  <nav class="menu">
+    <button data-menu="file">文件</button>
+    <button data-menu="edit">编辑</button>
+    <button data-menu="view">视图</button>
+    <button data-menu="help">帮助</button>
+  </nav>
+  <div class="acts">
+    <button id="btnUndo" class="ghost" title="撤销（Ctrl+Z）">撤销</button>
+    <button id="btnRedo" class="ghost" title="重做（Ctrl+Shift+Z）">重做</button>
+    <button id="btnNew" class="ghost">新建</button>
+    <button id="btnOpen" class="ghost">打开</button>
+    <button id="btnSave" class="ghost">保存</button>
+    <button id="btnObj" class="primary">导出 OBJ</button>
+    <button id="btnTex" class="ghost">导出贴图</button>
+    <button id="btnPkg" class="ghost">导出资源包</button>
+    <button id="btnSes" class="ghost">送去工坊</button>
+    <button id="btnJar" class="primary">生成附属包</button>
+    <button id="btnUpd" class="ghost" title="检查更新">更新</button>
+  </div>
+</header>
+
+<main class="shell">
+  <aside class="col left">
+    <section class="panel">
+      <h4>大纲 <span class="hint">8 组</span></h4>
+      <div id="tree" class="tree"></div>
+    </section>
+    <section class="panel grow">
+      <h4>贴图 <span class="hint">128 × 256</span></h4>
+      <div class="texwrap"><div class="texbox"><img id="tex" width="128" height="256" alt="贴图" draggable="false" /><canvas id="texOverlay" width="128" height="256"></canvas><span class="g" style="left:43%"></span><span class="g" style="left:68%"></span><span class="g" style="left:98.6%"></span></div></div>
+      <div class="paintbar">
+        <div class="swatches" id="swatches"></div>
+        <div class="prow"><span>笔粗</span><input id="brush" type="range" min="2" max="26" value="10" /><span id="brushVal">10</span></div>
+        <div class="prow2"><button id="eraser" class="ghost">橡皮</button><button id="texReset" class="ghost">重置贴图</button></div>
+      </div>
+      <div class="texfocus" id="texFocus">点部件名可高亮它的贴图区</div>
+      <div class="texlegend">
+        <i style="background:#3cd0c4"></i>刃 / 镡边
+        <i style="background:#0f1114"></i>刀身
+        <i style="background:#eeeeef"></i>柄
+        <i style="background:#39424f"></i>鞘
+      </div>
+    </section>
+  </aside>
+
+  <section class="viewport">
+    <div class="vbar">
+      <button data-view="front">正视</button>
+      <button data-view="side">侧视</button>
+      <button data-view="top">俯视</button>
+      <span class="sep"></span>
+      <button data-toggle="ref">原版基准</button>
+      <button data-toggle="grid" class="on">网格</button>
+      <span class="sep"></span>
+      <button data-toggle="wire">线框</button>
+    </div>
+    <canvas id="gl"></canvas>
+    <div class="vhint">黄色手柄可直接拖形状（刀尖/中部/镡/柄尾）· 空白拖动旋转 · 滚轮缩放</div>
+    <div class="axis"><span>Y</span><i></i><span>X</span></div>
+  </section>
+
+  <aside class="col right">
+    <section class="panel">
+      <h4>刀模参数</h4>
+      <div id="fields"></div>
+    </section>
+    <section class="panel">
+      <h4>部件 <span class="hint">增删元素</span></h4>
+      <div id="parts"></div>
+    </section>
+    <section class="panel">
+      <h4>预设</h4>
+      <div class="presets" id="presets"></div>
+      <div class="saverow"><input id="preName" placeholder="给自定义预设起个名（存本机）" /><button id="btnSavePre" class="ghost">＋存为预设</button></div>
+    </section>
+    <section class="panel">
+      <h4>附加件 <span class="hint">叠加装饰</span></h4>
+      <div class="addrow" id="addRow"></div>
+      <div class="extralist" id="extraList"></div>
+    </section>
+    <section class="panel grow">
+      <h4>模型信息</h4>
+      <div id="info" class="info"></div>
+      <div class="note">原点在镡：刀尖朝 +X、柄在 −X、刃面在 XY 平面。8 组名与坐标按 mcmod 教程 5202 固定，导出后直接可用。</div>
+    </section>
+  </aside>
+</main>
+
+<footer class="status">
+  <span id="stName">未命名</span>
+  <span id="stSel">选中：blade</span>
+  <span id="stStats">0 顶点 / 0 面</span>
+  <span id="stFps">— fps</span>
+  <span class="right" id="stMsg">就绪</span>
+</footer>
+
+<div id="modal" class="modal" hidden>
+  <div class="card">
+    <h3>新建刀模</h3>
+    <p>选一个起点，之后所有尺寸都能在右侧滑杆里改。</p>
+    <div class="newgrid" id="newGrid"></div>
+    <label class="row">名称 <input id="newName" value="无名刀" /></label>
+    <div class="foot">
+      <button id="newCancel" class="ghost">取消</button>
+      <button id="newOk" class="primary">创建</button>
+    </div>
+  </div>
+</div>
+
+<div id="sesModal" class="modal" hidden>
+  <div class="card">
+    <h3>送到樱刃工坊</h3>
+    <p>把当前的模型与贴图写成一个 .ses 工程。用樱刃工坊打开它，就能接着调奥义、附魔、配方并直接出包，不用再手动导 OBJ。</p>
+    <div class="jrow"><label>模组 ID</label><input id="sesModid" value="blademod" spellcheck="false" /></div>
+    <div class="jrow"><label>刀 ID</label><input id="sesBladeId" value="blade1" spellcheck="false" /></div>
+    <div class="jrow"><label>中文名</label><input id="sesName" value="无名刀" /></div>
+    <div class="jrow"><label>攻击力</label><input id="sesAtk" type="number" value="7" min="1" max="40" /></div>
+    <div class="jrow"><label>耐久</label><input id="sesDur" type="number" value="90" min="1" max="800" /></div>
+    <div class="foot">
+      <button id="sesCancel" class="ghost">取消</button>
+      <button id="sesOk" class="primary">导出 .ses</button>
+    </div>
+  </div>
+</div>
+
+<div id="jarModal" class="modal" hidden>
+  <div class="card">
+    <h3>生成拔刀剑附属包</h3>
+    <p>一键写出可直接放进 mods 的 .jar：纯数据模组，不含 Java，不用编译，依赖 SlashBlade: Resharped。</p>
+    <div class="jrow"><label>模组 ID</label><input id="jarModid" value="bladeforge" spellcheck="false" /></div>
+    <div class="jrow"><label>刀 ID</label><input id="jarBladeId" value="blade1" spellcheck="false" /></div>
+    <div class="jrow"><label>中文名</label><input id="jarName" value="无名刀" /></div>
+    <div class="jrow"><label>攻击力</label><input id="jarAtk" type="number" value="7" min="1" max="40" /></div>
+    <div class="jrow"><label>耐久</label><input id="jarDur" type="number" value="90" min="1" max="800" /></div>
+    <div class="jrow"><label>版本</label><input id="jarVer" value="1.0.0" /></div>
+    <div class="foot">
+      <button id="jarCancel" class="ghost">取消</button>
+      <button id="jarOk" class="primary">生成 jar</button>
+    </div>
+  </div>
+</div>
+
+<div id="updModal" class="modal" hidden>
+  <div class="card" style="width:640px;max-height:80vh;overflow:auto">
+    <h3>更新</h3>
+    <p>检查新版本、下载并替换当前程序。支持 GitHub Releases（公开或私有仓库）、latest.json 地址、本地目录。</p>
+    <div id="updBody"></div>
+    <div class="foot" style="margin-top:12px">
+      <button id="updClose" class="ghost">关闭</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  window.addEventListener('error', function (ev) {
+    var el = document.getElementById('stMsg');
+    if (el) el.textContent = '错误：' + (ev.message || '');
+  });
+</script>
+<script src="bundle.js"></script>
+</body>
+</html>

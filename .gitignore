@@ -1,0 +1,23 @@
+node_modules/
+dist/
+tools/
+.testserver/
+.tmp-tool-results/
+
+# 构建产物与大文件不进仓库
+*.zip
+*.jar
+!blade-arts/gradle/wrapper/gradle-wrapper.jar
+*.ses
+*.log
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# 由 scripts/prepare.js 生成的构建产物
+blade-forge/src/renderer/vendor/
+blade-forge/src/renderer/bundle.js
+sakura-edge-studio/src/renderer/vendor/
+sakura-edge-studio/src/renderer/bundle.js
+sakura-edge-studio/src/renderer/builtin.json
