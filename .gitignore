@@ -20,3 +20,6 @@ blade-forge/src/renderer/bundle.js
 sakura-edge-studio/src/renderer/vendor/
 sakura-edge-studio/src/renderer/bundle.js
 sakura-edge-studio/src/renderer/builtin.json
+
+# 根目录误生成的构建副本
+sakura-edge-studio/bundle.js
