@@ -9,6 +9,7 @@ export const EXTRA_LIST = [
   { type: 'hanger', label: '鞘挂饰', target: 'blade', color: 0x9aa7b3, defT: 0.88, defK: 1.0, desc: '鞘口双金属环：位置=沿刀身' },
   { type: 'glow', label: '刀光', target: 'effect', color: 0x6fe8da, defT: 0.35, defK: 1.0, desc: '刃口光带：位置=光带起点' },
   { type: 'sparks', label: '火花', target: 'effect', color: 0xffc061, defT: 0.45, defK: 1.0, desc: '光点：位置=分布起点' },
+  { type: 'cube', label: '方块', target: 'blade', color: 0x8f979f, defT: 0.5, defK: 1.0, desc: '自由方块：位置/宽高厚/倾斜都能改，可当护手、挂件、血槽' },
 ];
 
 function quadStrip(pos, uv, idx, path, wFn, vTag) {
@@ -156,7 +157,42 @@ function buildSparks(p, t, k) {
   return finish(pos, uv, idx, 'sparks');
 }
 
-const BUILDERS = { crest: buildCrest, tassel: buildTassel, hanger: buildHanger, glow: buildGlow, sparks: buildSparks };
+/* 自由方块：中心贴在刀身 t 处，可上下偏移、可倾斜，尺寸可调 */
+function buildCube(p, t, scale, e) {
+  const pos = [], uv = [], idx = [];
+  const hx = (e && e.w != null ? e.w : 12) * 0.5 * scale;
+  const hy = (e && e.h != null ? e.h : 10) * 0.5 * scale;
+  const hz = (e && e.d != null ? e.d : 8) * 0.5 * scale;
+  const tt = Math.max(0, Math.min(1.15, t));
+  const cx = p.len * tt + (e && e.ox ? e.ox : 0);
+  const cy = p.sori * tt * tt + (e && e.oy ? e.oy : 0);
+  const cz = e && e.oz ? e.oz : 0;
+  const rot = e && e.rot ? e.rot : 0;
+  const c = Math.cos(rot), s = Math.sin(rot);
+  const base = pos.length / 3;
+  for (const sx of [-1, 1]) {
+    for (const sy of [-1, 1]) {
+      for (const sz of [-1, 1]) {
+        const x = sx * hx, y = sy * hy;
+        pos.push(cx + x * c - y * s, cy + x * s + y * c, cz + sz * hz);
+      }
+    }
+  }
+  const quads = [
+    [0, 1, 3, 2], [4, 6, 7, 5], [0, 4, 5, 1], [2, 3, 7, 6], [0, 2, 6, 4], [1, 5, 7, 3],
+  ];
+  const corners = [[0.52, 0.42], [0.66, 0.42], [0.66, 0.55], [0.52, 0.55]];
+  for (const q of quads) {
+    idx.push(base + q[0], base + q[1], base + q[3], base + q[0], base + q[3], base + q[2]);
+    for (const cIdx of q) {
+      const cc = corners[q.indexOf(cIdx) % 4];
+      uv.push(cc[0], cc[1]);
+    }
+  }
+  return finish(pos, uv, idx, 'cube');
+}
+
+const BUILDERS = { cube: buildCube, crest: buildCrest, tassel: buildTassel, hanger: buildHanger, glow: buildGlow, sparks: buildSparks };
 
 // extras: [{ type, t, scale }] → { blade: geo|null, effect: geo|null }
 export function buildExtras(extras, params) {
@@ -168,8 +204,8 @@ export function buildExtras(extras, params) {
     out.push({
       type: e.type,
       target: meta.target,
-      color: meta.color,
-      geo: fn(params, e.t == null ? 0.9 : e.t, e.scale == null ? 1 : e.scale),
+      color: e.color == null ? meta.color : e.color,
+      geo: fn(params, e.t == null ? 0.9 : e.t, e.scale == null ? 1 : e.scale, e),
     });
   }
   return out;

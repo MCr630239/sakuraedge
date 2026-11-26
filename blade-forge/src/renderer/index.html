@@ -6,53 +6,110 @@
 <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-<header class="topbar">
-  <div class="brand"><span class="logo">▮</span><b>Blade Forge</b><em>拔刀剑建模器 <span id="brandVer">0.18.6</span></em></div>
+
+<!-- ═══ 顶部菜单栏 ═══ -->
+<header class="bb-menubar">
+  <div class="brand">
+    <span class="logo"></span>
+    <b>Blade Forge</b>
+    <span class="sub">拔刀剑建模器 <span id="brandVer">0.18.7</span></span>
+  </div>
   <nav class="menu">
     <button data-menu="file">文件</button>
     <button data-menu="edit">编辑</button>
     <button data-menu="view">视图</button>
     <button data-menu="help">帮助</button>
   </nav>
-  <div class="acts">
-    <button id="btnUndo" class="ghost" title="撤销（Ctrl+Z）">撤销</button>
-    <button id="btnRedo" class="ghost" title="重做（Ctrl+Shift+Z）">重做</button>
-    <button id="btnNew" class="ghost">新建</button>
-    <button id="btnOpen" class="ghost">打开</button>
-    <button id="btnSave" class="ghost">保存</button>
-    <button id="btnObj" class="primary">导出 OBJ</button>
-    <button id="btnTex" class="ghost">导出贴图</button>
-    <button id="btnPkg" class="ghost">导出资源包</button>
-    <button id="btnSes" class="ghost">送去工坊</button>
-    <button id="btnJar" class="primary">生成附属包</button>
-    <button id="btnUpd" class="ghost" title="检查更新">更新</button>
-    <button id="btnFb" class="ghost" title="反馈 / 提建议（GitHub Issues）">反馈</button>
+  <div class="spacer"></div>
+  <div class="menuright">
+    <button id="btnUpd" class="mb">更新</button>
+    <button id="btnFb" class="mb">反馈</button>
   </div>
 </header>
 
-<main class="shell">
-  <aside class="col left">
-    <section class="panel">
-      <h4>大纲 <span class="hint">8 组</span> <button id="btnShowAll" class="ghost mini">全部显示</button></h4>
-      <div id="tree" class="tree"></div>
-    </section>
-    <section class="panel grow">
-      <h4>贴图 <span class="hint">128 × 256</span></h4>
-      <div class="texwrap"><div class="texbox"><img id="tex" width="128" height="256" alt="贴图" draggable="false" /><canvas id="texOverlay" width="128" height="256"></canvas><span class="g" style="left:43%"></span><span class="g" style="left:68%"></span><span class="g" style="left:98.6%"></span></div></div>
-      <div class="paintbar">
-        <div class="swatches" id="swatches"></div>
-        <div class="prow"><span>笔粗</span><input id="brush" type="range" min="2" max="26" value="10" /><span id="brushVal">10</span></div>
-        <div class="prow2"><button id="eraser" class="ghost">橡皮</button><button id="texReset" class="ghost">重置贴图</button></div>
+<!-- ═══ 工具条 ═══ -->
+<header class="bb-toolbar">
+  <div class="tgrp">
+    <button id="btnNew" class="tb" title="新建刀模">
+      <svg viewBox="0 0 16 16"><path d="M4 1h6l3 3v11H4z" /><path d="M10 1v3h3" /></svg><span>新建</span>
+    </button>
+    <button id="btnOpen" class="tb" title="打开 .ses / 工程">
+      <svg viewBox="0 0 16 16"><path d="M1 4h5l1.5 2H15v8H1z" /></svg><span>打开</span>
+    </button>
+    <button id="btnSave" class="tb" title="保存工程">
+      <svg viewBox="0 0 16 16"><path d="M2 2h10l2 2v10H2z" /><path d="M5 2v5h6V2" /></svg><span>保存</span>
+    </button>
+  </div>
+  <div class="tsep"></div>
+  <div class="tgrp">
+    <button id="btnUndo" class="tb" title="撤销（Ctrl+Z）">
+      <svg viewBox="0 0 16 16"><path d="M6 4L2 8l4 4" /><path d="M2 8h7a4 4 0 010 8" /></svg><span>撤销</span>
+    </button>
+    <button id="btnRedo" class="tb" title="重做（Ctrl+Shift+Z）">
+      <svg viewBox="0 0 16 16"><path d="M10 4l4 4-4 4" /><path d="M14 8H7a4 4 0 000 8" /></svg><span>重做</span>
+    </button>
+  </div>
+  <div class="tsep"></div>
+  <div class="tgrp">
+    <button id="btnObj" class="tb accent" title="导出 OBJ + 贴图">
+      <svg viewBox="0 0 16 16"><path d="M8 1l6 3.5v7L8 15 2 11.5v-7z" /><path d="M8 1v14" /></svg><span>导出 OBJ</span>
+    </button>
+    <button id="btnTex" class="tb" title="导出 128×256 贴图">
+      <svg viewBox="0 0 16 16"><rect x="2" y="2" width="12" height="12" /><path d="M2 9h12M8 2v12" /></svg><span>贴图</span>
+    </button>
+    <button id="btnPkg" class="tb" title="导出资源包 zip">
+      <svg viewBox="0 0 16 16"><path d="M2 4l6-2 6 2v9l-6 2-6-2z" /><path d="M2 4l6 2 6-2M8 6v9" /></svg><span>资源包</span>
+    </button>
+    <button id="btnSes" class="tb" title="导出 .ses 送到樱刃工坊">
+      <svg viewBox="0 0 16 16"><path d="M2 8h9" /><path d="M8 4l4 4-4 4" /><path d="M14 2v12" /></svg><span>送工坊</span>
+    </button>
+    <button id="btnJar" class="tb accent" title="生成拔刀剑附属包 jar">
+      <svg viewBox="0 0 16 16"><path d="M3 2h10v12H3z" /><path d="M3 6h10M6 2v12" /></svg><span>附属包</span>
+    </button>
+  </div>
+  <div class="spacer"></div>
+  <div class="tgrp right">
+    <div class="bbsearch"><input id="treeSearch" placeholder="搜索元素 / 参数…" spellcheck="false" /></div>
+  </div>
+</header>
+
+<!-- ═══ 主体 ═══ -->
+<main class="bb-body">
+  <aside class="bb-side left" id="paneLeft">
+    <section class="pane" id="paneOutliner">
+      <header class="ph">
+        <b>大纲</b><span class="hint">8 组</span>
+        <button class="pcol" data-col="outliner" title="折叠">⌃</button>
+      </header>
+      <div class="pbody">
+        <div id="tree" class="tree"></div>
+        <div class="pfoot"><button id="btnShowAll" class="mini">全部显示</button></div>
       </div>
-      <div class="texfocus" id="texFocus">点部件名可高亮它的贴图区</div>
-      <div class="texlegend">
-        <i style="background:#3cd0c4"></i>刃 / 镡边
-        <i style="background:#0f1114"></i>刀身
-        <i style="background:#eeeeef"></i>柄
-        <i style="background:#39424f"></i>鞘
+    </section>
+    <section class="pane grow" id="paneTex">
+      <header class="ph">
+        <b>贴图</b><span class="hint">128 × 256</span>
+        <button class="pcol" data-col="tex" title="折叠">⌃</button>
+      </header>
+      <div class="pbody">
+        <div class="texwrap"><div class="texbox"><img id="tex" width="128" height="256" alt="贴图" draggable="false" /><canvas id="texOverlay" width="128" height="256"></canvas><span class="g" style="left:43%"></span><span class="g" style="left:68%"></span><span class="g" style="left:98.6%"></span></div></div>
+        <div class="paintbar">
+          <div class="swatches" id="swatches"></div>
+          <div class="prow"><span>笔粗</span><input id="brush" type="range" min="2" max="26" value="10" /><span id="brushVal">10</span></div>
+          <div class="prow2"><button id="eraser" class="ghost">橡皮</button><button id="texReset" class="ghost">重置贴图</button></div>
+        </div>
+        <div class="texfocus" id="texFocus">点部件名可高亮它的贴图区</div>
+        <div class="texlegend">
+          <i style="background:#3cd0c4"></i>刃 / 镡边
+          <i style="background:#0f1114"></i>刀身
+          <i style="background:#eeeeef"></i>柄
+          <i style="background:#39424f"></i>鞘
+        </div>
       </div>
     </section>
   </aside>
+
+  <div class="splitter" data-side="left"></div>
 
   <section class="viewport">
     <div class="vbar">
@@ -65,43 +122,59 @@
       <span class="sep"></span>
       <button data-toggle="wire">线框</button>
       <button data-toggle="handles" class="on" title="拖动用的黄点">手柄</button>
+      <span class="spacer"></span>
+      <span id="vLabel" class="vlabel">透视视图</span>
     </div>
-    <canvas id="gl"></canvas>
-    <div class="vhint">黄色手柄可直接拖形状 · 空白拖动旋转 · 右键/中键/Shift+左键拖动平移 · 方向键/ADQE 微调 · 滚轮缩放</div>
-    <div class="axis"><span>Y</span><i></i><span>X</span></div>
+    <div class="vstage">
+      <canvas id="gl"></canvas>
+      <div class="vhint">黄色手柄可直接拖形状 · 空白拖动旋转 · 右键/中键/Shift+左键拖动平移 · 方向键/ADQE 微调 · 滚轮缩放</div>
+      <div class="axis"><span class="ay">Y</span><span class="ax">X</span><span class="az">Z</span><i></i></div>
+      <div class="vzoom" id="vZoom">100%</div>
+    </div>
   </section>
 
-  <aside class="col right">
-    <section class="panel">
-      <h4>刀模参数</h4>
-      <div id="fields"></div>
-    </section>
-    <section class="panel">
-      <h4>部件 <span class="hint">增删元素</span></h4>
-      <div id="parts"></div>
-    </section>
-    <section class="panel">
-      <h4>预设</h4>
-      <div class="presets" id="presets"></div>
-      <div class="saverow"><input id="preName" placeholder="给自定义预设起个名（存本机）" /><button id="btnSavePre" class="ghost">＋存为预设</button></div>
-    </section>
-    <section class="panel">
-      <h4>附加件 <span class="hint">叠加装饰</span></h4>
-      <div class="addrow" id="addRow"></div>
-      <div class="extralist" id="extraList"></div>
-    </section>
-    <section class="panel grow">
-      <h4>模型信息</h4>
-      <div id="info" class="info"></div>
-      <div class="note">原点在镡：刀尖朝 +X、柄在 −X、刃面在 XY 平面。8 组名与坐标按 mcmod 教程 5202 固定，导出后直接可用。</div>
-    </section>
+  <div class="splitter" data-side="right"></div>
+
+  <aside class="bb-side right" id="paneRight">
+    <nav class="tabs">
+      <button data-tab="shape" class="on">形状</button>
+      <button data-tab="extras">附加件</button>
+      <button data-tab="presets">预设</button>
+      <button data-tab="info">信息</button>
+    </nav>
+    <div class="tabbody">
+      <div class="tabpage" data-page="shape">
+        <div class="sub"><b>刀模参数</b><span class="hint">滑杆 / 数值可直接改</span></div>
+        <div id="fields" class="fields"></div>
+        <div class="sub"><b>部件</b><span class="hint">增删元素</span></div>
+        <div id="parts" class="parts"></div>
+      </div>
+      <div class="tabpage" data-page="extras">
+        <div class="sub"><b>附加件</b><span class="hint">叠加装饰</span></div>
+        <div class="addrow" id="addRow"></div>
+        <div class="extralist" id="extraList"></div>
+      </div>
+      <div class="tabpage" data-page="presets">
+        <div class="sub"><b>预设</b><span class="hint">内置 + 自定义</span></div>
+        <div class="presets" id="presets"></div>
+        <div class="saverow"><input id="preName" placeholder="给自定义预设起个名（存本机）" /><button id="btnSavePre" class="ghost">＋存为预设</button></div>
+      </div>
+      <div class="tabpage" data-page="info">
+        <div class="sub"><b>模型信息</b></div>
+        <div id="info" class="info"></div>
+        <div class="note">原点在镡：刀尖朝 +X、柄在 −X、刃面在 XY 平面。8 组名与坐标按 mcmod 教程 5202 固定，导出后直接可用。</div>
+      </div>
+    </div>
   </aside>
 </main>
 
-<footer class="status">
+<footer class="bb-status">
   <span id="stName">未命名</span>
+  <span class="dot"></span>
   <span id="stSel">选中：blade</span>
+  <span class="dot"></span>
   <span id="stStats">0 顶点 / 0 面</span>
+  <span class="dot"></span>
   <span id="stFps">— fps</span>
   <span class="right" id="stMsg">就绪</span>
 </footer>

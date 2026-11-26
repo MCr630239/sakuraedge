@@ -721,6 +721,37 @@ for (const d of HANDLE_DEFS) {
   handleObjs[d[0]] = m;
 }
 
+const cubeHandleMat = new THREE.MeshBasicMaterial({ color: 0x6fe8da, transparent: true, opacity: 0.95 });
+const cubeHandles = [];
+function layoutCubeHandles(p) {
+  const cubes = [];
+  doc.extras.forEach((e, i) => { if (e.type === 'cube') cubes.push({ e: e, i: i }); });
+  while (cubeHandles.length < cubes.length) {
+    const m = new THREE.Mesh(new THREE.SphereGeometry(5.2, 12, 9), cubeHandleMat);
+    m.userData.key = 'cube';
+    m.userData.tip = '方块：拖动＝沿刀移动 / 上下偏移';
+    handleGroup.add(m);
+    cubeHandles.push(m);
+  }
+  cubeHandles.forEach((m, k) => {
+    if (k >= cubes.length) { m.visible = false; return; }
+    const e = cubes[k].e;
+    const tt = Math.max(0, Math.min(1.15, e.t == null ? 0.5 : e.t));
+    m.userData.idx = cubes[k].i;
+    m.visible = handleGroup.visible !== false;
+    m.position.set(p.len * tt + (e.ox || 0), p.sori * tt * tt + (e.oy || 0), (e.oz || 0) + ((e.d || 8) * 0.5 * (e.scale || 1)) + 4);
+  });
+}
+
+function syncExtraSliders() {
+  doc.extras.forEach((e, i) => {
+    const et = document.querySelector('[data-et="' + i + '"]');
+    if (et) et.value = String(e.t == null ? 0.9 : e.t);
+    const eo = document.querySelector('[data-eoy="' + i + '"]');
+    if (eo) eo.value = String(e.oy == null ? 0 : e.oy);
+  });
+}
+
 function updateHandles() {
   const p = doc.params;
   handleObjs.tip.visible = p.bladeOn !== false;
@@ -731,6 +762,7 @@ function updateHandles() {
   handleObjs.mid.position.set(p.len * 0.5, p.sori * 0.25 + 4, 8);
   handleObjs.guard.position.set(0.9, p.gry, 8);
   handleObjs.hend.position.set(-p.hlen, 0, 8);
+  layoutCubeHandles(p);
 }
 
 // ---------- 交互 ----------
@@ -760,7 +792,7 @@ canvas.addEventListener('pointerdown', function (ev) {
   pickRay.setFromCamera(ndcOf(ev), cam);
   const hit = handleGroup.visible ? pickRay.intersectObjects(handleGroup.children, false)[0] : null;
   if (hit) {
-    drag = { mode: 'handle', key: hit.object.userData.key, tip: hit.object.userData.tip };
+    drag = { mode: 'handle', key: hit.object.userData.key, idx: hit.object.userData.idx, tip: hit.object.userData.tip };
     msg(drag.tip);
     return;
   }
@@ -780,6 +812,7 @@ canvas.addEventListener('pointermove', function (ev) {
     drag.moved = Math.max(drag.moved, Math.abs(dx) + Math.abs(dy));
     camTheta = drag.theta - dx * 0.006;
     camPhi = Math.min(Math.PI - 0.05, Math.max(0.05, drag.phi - dy * 0.006));
+    if (drag.moved > 8) setViewLabel('自由视角');
     updateCamera(); draw();
     return;
   }
@@ -787,6 +820,17 @@ canvas.addEventListener('pointermove', function (ev) {
   const p = new THREE.Vector3();
   if (!pickRay.ray.intersectPlane(dragPlane, p)) return;
   const pa = doc.params;
+  if (drag.key === 'cube') {
+    const e = doc.extras[drag.idx];
+    if (!e) return;
+    const tt = Math.max(0, Math.min(1.15, p.x / (pa.len || 1)));
+    e.t = Math.round(tt * 100) / 100;
+    e.oy = Math.round(p.y - pa.sori * tt * tt);
+    syncExtraSliders();
+    rebuild({ keepExtrasUI: true });
+    histPush(false);
+    return;
+  }
   if (drag.key === 'tip') {
     pa.len = Math.min(360, Math.max(60, Math.round(p.x)));
     pa.sori = Math.min(110, Math.max(0, Math.round(p.y)));
@@ -820,6 +864,7 @@ canvas.addEventListener('pointerup', function (ev) {
 canvas.addEventListener('wheel', (ev) => {
   ev.preventDefault();
   camDist = Math.min(2000, Math.max(90, camDist * (1 + Math.sign(ev.deltaY) * 0.12)));
+  setZoomLabel();
   updateCamera(); draw();
 }, { passive: false });
 
@@ -931,6 +976,19 @@ function renderExtras() {
         + '<div class="sl"><span>分组</span><select data-eslot="' + i + '"><option value="blade"' + ((e.slot || 'blade') === 'blade' ? ' selected' : '')
         + '>blade</option><option value="effect"' + (e.slot === 'effect' ? ' selected' : '') + '>effect</option></select></div></div>';
     }
+    if (e.type === 'cube') {
+      const c = (e.color == null ? 0x8f979f : e.color).toString(16).padStart(6, '0');
+      return '<div class="extrait"><div class="hd"><span class="sw" style="background:#' + c + '"></span>方块'
+        + '<span class="x" data-del="' + i + '">×</span></div>'
+        + '<div class="sl"><span>沿刀</span><input type="range" data-et="' + i + '" min="0" max="1.15" step="0.01" value="' + (e.t == null ? 0.5 : e.t) + '" /></div>'
+        + '<div class="sl"><span>宽</span><input type="range" data-ew="' + i + '" min="1" max="80" step="0.5" value="' + (e.w == null ? 12 : e.w) + '" /></div>'
+        + '<div class="sl"><span>高</span><input type="range" data-eh="' + i + '" min="1" max="80" step="0.5" value="' + (e.h == null ? 10 : e.h) + '" /></div>'
+        + '<div class="sl"><span>厚</span><input type="range" data-ed="' + i + '" min="1" max="40" step="0.5" value="' + (e.d == null ? 8 : e.d) + '" /></div>'
+        + '<div class="sl"><span>上下</span><input type="range" data-eoy="' + i + '" min="-50" max="50" step="1" value="' + (e.oy == null ? 0 : e.oy) + '" /></div>'
+        + '<div class="sl"><span>倾斜</span><input type="range" data-ero="' + i + '" min="-1.3" max="1.3" step="0.02" value="' + (e.rot == null ? 0 : e.rot) + '" /></div>'
+        + '<div class="sl"><span>分组</span><select data-eslot="' + i + '"><option value="blade"' + ((e.slot || 'blade') === 'blade' ? ' selected' : '')
+        + '>blade</option><option value="effect"' + (e.slot === 'effect' ? ' selected' : '') + '>effect</option></select></div></div>';
+    }
     const meta = EXTRA_LIST.find((x) => x.type === e.type) || { label: e.type, color: 0x888888 };
     const hex = (meta.color || 0x888888).toString(16).padStart(6, '0');
     return '<div class="extrait"><div class="hd"><span class="sw" style="background:#' + hex + '"></span>' + meta.label
@@ -1005,7 +1063,9 @@ if ($('addRow')) {
     const b = ev.target.closest('[data-add]');
     if (!b) return;
     const meta = EXTRA_LIST.find((x) => x.type === b.dataset.add) || {};
-    doc.extras.push({ type: b.dataset.add, t: meta.defT == null ? 0.5 : meta.defT, scale: meta.defK == null ? 1 : meta.defK });
+    const seed = { type: b.dataset.add, t: meta.defT == null ? 0.5 : meta.defT, scale: meta.defK == null ? 1 : meta.defK };
+    if (b.dataset.add === 'cube') Object.assign(seed, { w: 12, h: 10, d: 8, oy: 6, rot: 0, slot: 'blade' });
+    doc.extras.push(seed);
     rebuild();
     histPush(true);
     msg('已加 ' + (EXTRA_LIST.find((x) => x.type === b.dataset.add) || {}).label);
@@ -1022,6 +1082,11 @@ if ($('addRow')) {
     if (t.matches('[data-et]')) doc.extras[Number(t.dataset.et)].t = Number(t.value);
     else if (t.matches('[data-es]')) doc.extras[Number(t.dataset.es)].scale = Number(t.value);
     else if (t.matches('[data-ey]')) doc.extras[Number(t.dataset.ey)].yOff = Number(t.value);
+    else if (t.matches('[data-ew]')) doc.extras[Number(t.dataset.ew)].w = Number(t.value);
+    else if (t.matches('[data-eh]')) doc.extras[Number(t.dataset.eh)].h = Number(t.value);
+    else if (t.matches('[data-ed]')) doc.extras[Number(t.dataset.ed)].d = Number(t.value);
+    else if (t.matches('[data-eoy]')) doc.extras[Number(t.dataset.eoy)].oy = Number(t.value);
+    else if (t.matches('[data-ero]')) doc.extras[Number(t.dataset.ero)].rot = Number(t.value);
     else return;
     rebuild({ keepExtrasUI: true });
     histPush(false);
@@ -1165,7 +1230,7 @@ document.querySelector('.vbar').addEventListener('click', (ev) => {
   const v = ev.target.closest('[data-view]');
   if (v) {
     const k = v.dataset.view;
-    if (k === 'front') { camTheta = 0; camPhi = Math.PI / 2 - 0.04; autoFrame(); }
+    if (k === 'front') { camTheta = 0; camPhi = Math.PI / 2 - 0.04; autoFrame(); setViewLabel('正视图'); setZoomLabel(); }
     if (k === 'side') { camTheta = -1.05; camPhi = 1.24; camDist = 700; }
     if (k === 'top') { camTheta = 0; camPhi = 0.30; camDist = 780; }
     camTarget.set(88, 16, 0);
@@ -1684,6 +1749,68 @@ rebuild();
 histPush(true);
 histBtn();
 updateCamera();
+/* ---------- Blockbench 风格面板交互 ---------- */
+const BASE_DIST = 690;
+function setViewLabel(t) { const el = $('vLabel'); if (el) el.textContent = t; }
+function setZoomLabel() { const el = $('vZoom'); if (el) el.textContent = Math.round(BASE_DIST / camDist * 100) + '%'; }
+
+document.querySelectorAll('.tabs button').forEach((b) => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('.tabs button').forEach((x) => x.classList.toggle('on', x === b));
+    const k = b.dataset.tab;
+    document.querySelectorAll('.tabpage').forEach((pg) => { pg.hidden = pg.dataset.page !== k; });
+    if (k === 'shape') setTimeout(resize, 30);
+  });
+});
+
+document.querySelectorAll('.pcol').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    const pane = btn.closest('.pane');
+    const folded = pane.classList.toggle('collapsed');
+    btn.textContent = folded ? '⌄' : '⌃';
+    setTimeout(resize, 60);
+  });
+});
+
+document.querySelectorAll('.splitter').forEach((sp) => {
+  sp.addEventListener('pointerdown', (ev) => {
+    ev.preventDefault();
+    const side = sp.dataset.side;
+    const body = document.querySelector('.bb-body');
+    try { sp.setPointerCapture(ev.pointerId); } catch (_) {}
+    const move = (e) => {
+      const r = body.getBoundingClientRect();
+      if (side === 'left') body.style.setProperty('--leftw', Math.min(430, Math.max(180, e.clientX - r.left)) + 'px');
+      else body.style.setProperty('--rightw', Math.min(470, Math.max(220, r.right - e.clientX)) + 'px');
+      resize();
+    };
+    const up = () => {
+      sp.removeEventListener('pointermove', move);
+      sp.removeEventListener('pointerup', up);
+      sp.removeEventListener('pointercancel', up);
+    };
+    sp.addEventListener('pointermove', move);
+    sp.addEventListener('pointerup', up);
+    sp.addEventListener('pointercancel', up);
+  });
+});
+
+document.querySelector('.vbar').addEventListener('click', (ev) => {
+  const b = ev.target.closest('[data-view]');
+  if (b) setViewLabel({ front: '正视图', side: '侧视图', top: '俯视图' }[b.dataset.view] || '视图');
+});
+
+const treeSearch = $('treeSearch');
+if (treeSearch) {
+  treeSearch.addEventListener('input', () => {
+    const q = treeSearch.value.trim().toLowerCase();
+    document.querySelectorAll('#tree .grp').forEach((r) => {
+      const hit = !q || (r.textContent || '').toLowerCase().indexOf(q) >= 0;
+      r.style.display = hit ? '' : 'none';
+    });
+  });
+}
+
 resize();
 new ResizeObserver(() => resize()).observe(canvas.parentElement);
 window.addEventListener('resize', resize);
