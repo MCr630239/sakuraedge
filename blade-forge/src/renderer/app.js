@@ -127,8 +127,7 @@ const canvas = $('gl');
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
 renderer.setClearColor(0x0b0d10, 1);
-renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.shadowMap.enabled = false;
 
 /* GPU 信息：状态栏显示，软件渲染时自动关阴影，避免某些驱动上整片发黑 */
 let gpuTag = '';
@@ -141,6 +140,11 @@ try {
   softGL = /swiftshader|llvmpipe|software|basic render|warp/i.test(raw);
 } catch (_) {}
 if (softGL) renderer.shadowMap.enabled = false;
+if (renderer.debug) {
+  renderer.debug.onShaderError = function () {
+    try { msg('着色器编译失败（显卡驱动兼容问题），可在「视图」菜单开兼容模式'); } catch (_) {}
+  };
+}
 
 const scene = new THREE.Scene();
 const root = new THREE.Group();
@@ -155,7 +159,7 @@ scene.add(new THREE.HemisphereLight(0xe8f0ff, 0x171b24, 1.05));
 scene.add(new THREE.AmbientLight(0xffffff, 0.45));
 const key = new THREE.DirectionalLight(0xffffff, 1.35);
 key.position.set(300, 320, 260);
-key.castShadow = true;
+key.castShadow = false;
 key.shadow.mapSize.set(1024, 1024);
 key.shadow.camera.left = -320;
 key.shadow.camera.right = 320;
@@ -190,14 +194,31 @@ tex.anisotropy = 1;
 
 const meshes = {};
 const mats = {};
+let compatMode = false;
+
+/* 参数兜底：任何一项变成 NaN/Infinity 都会让整个几何失效、整把刀消失 */
+function sanitizeParams() {
+  for (const k of Object.keys(doc.params)) {
+    const v = doc.params[k];
+    if (typeof v === 'number' && !Number.isFinite(v)) {
+      doc.params[k] = (DEFAULT_ALL[k] !== undefined ? DEFAULT_ALL[k] : 0);
+    }
+  }
+}
+
 function matFor(name, color) {
   if (mats[name]) return mats[name];
   let m;
+  if (compatMode && name !== 'effect') {
+    m = new THREE.MeshBasicMaterial({ color: 0xa9c4dd, side: THREE.DoubleSide });
+    mats[name] = m;
+    return m;
+  }
   if (name === 'effect') {
     m = new THREE.MeshBasicMaterial({ color: 0x62e6d6, transparent: true, opacity: 0.5, side: THREE.DoubleSide, depthWrite: false });
   } else {
     m = new THREE.MeshLambertMaterial({
-      map: tex, color: 0xffffff, emissive: 0x2f3f52,
+      map: tex, color: 0xffffff, emissive: 0x4a5d74,
       side: THREE.DoubleSide,
     });
   }
@@ -244,7 +265,9 @@ function clearExtras() {
   exMeshes = [];
 }
 
-function rebuild() {
+function rebuild(opts) {
+  const keepExtras = opts && opts.keepExtrasUI;
+  sanitizeParams();
   clearMeshes();
   clearExtras();
   const list = buildGeometries(doc.params);
@@ -254,8 +277,8 @@ function rebuild() {
     const mesh = new THREE.Mesh(geo, matFor(name, color));
     mesh.name = name;
     mesh.visible = doc.visible[name] !== false;
-    mesh.castShadow = true;
-    mesh.receiveShadow = true;
+    mesh.castShadow = false;
+    mesh.receiveShadow = false;
     root.add(mesh);
     meshes[name] = mesh;
   }
@@ -278,7 +301,7 @@ function rebuild() {
   }
   applyWire();
   paintSelection();
-  renderExtras();
+  if (!keepExtras) renderExtras();
   renderTree();
   renderInfo();
   drawTex();
@@ -592,7 +615,11 @@ function bindPaint() {
     $('eraser').classList.remove('on');
     buildSwatches();
   });
-  $('brush').addEventListener('input', (ev) => { paint.size = Number(ev.target.value); });
+  $('brush').addEventListener('input', (ev) => {
+  paint.size = Number(ev.target.value);
+  const bv = $('brushVal');
+  if (bv) bv.textContent = ev.target.value;
+});
   $('eraser').addEventListener('click', () => {
     paint.eraser = !paint.eraser;
     $('eraser').classList.toggle('on', paint.eraser);
@@ -792,6 +819,16 @@ $('tree').addEventListener('click', (ev) => {
   renderTree(); paintSelection(); draw(); updateStatus();
 });
 
+// 大纲：全部显示
+const showAllBtn = $('btnShowAll');
+if (showAllBtn) showAllBtn.addEventListener('click', () => {
+  for (const g of GROUPS) {
+    doc.visible[g[0]] = true;
+    if (meshes[g[0]]) meshes[g[0]].visible = true;
+  }
+  renderTree(); paintSelection(); draw(); updateStatus();
+});
+
 // 参数滑杆
 $('fields').addEventListener('input', (ev) => {
   const inp = ev.target.closest('input[data-p]');
@@ -963,7 +1000,7 @@ if ($('addRow')) {
     else if (t.matches('[data-es]')) doc.extras[Number(t.dataset.es)].scale = Number(t.value);
     else if (t.matches('[data-ey]')) doc.extras[Number(t.dataset.ey)].yOff = Number(t.value);
     else return;
-    rebuild();
+    rebuild({ keepExtrasUI: true });
     histPush(false);
   });
   $('extraList').addEventListener('change', (ev) => {
@@ -1473,14 +1510,75 @@ $('newOk').addEventListener('click', () => {
 });
 
 // 菜单
+/* 顶栏菜单：点按钮弹出下拉，不用去记每个按钮干什么 */
+let menuPop = null;
+const MENU_DEF = {
+  file: [['新建', 'new'], ['打开工程', 'open'], ['保存工程', 'save'], ['导出 OBJ', 'obj'], ['导出贴图', 'tex'], ['导出资源包', 'pkg'], ['生成附属包', 'jar'], ['送去工坊', 'ses']],
+  edit: [['撤销', 'undo'], ['重做', 'redo'], ['按当前参数重建几何', 'rebuild'], ['清空附加件', 'clearx']],
+  view: [['正视', 'front'], ['侧视', 'side'], ['俯视', 'top'], ['重置视角', 'reset'], ['全部显示组', 'showall'], ['重置参数', 'resetparams'], ['兼容模式（纯色）', 'compat'], ['原版基准', 'ref'], ['网格', 'grid'], ['线框', 'wire'], ['手柄', 'handles']],
+  help: [['快捷键', 'keys'], ['反馈 / 提建议', 'fb'], ['GitHub 仓库', 'repo']],
+};
+function closeMenu() { if (menuPop) { menuPop.remove(); menuPop = null; } }
 document.querySelector('.menu').addEventListener('click', (ev) => {
   const b = ev.target.closest('button');
   if (!b) return;
-  const k = b.dataset.menu;
-  if (k === 'file') openNew();
-  if (k === 'edit') { syncFields(); rebuild(); msg('已按当前参数重建'); }
-  if (k === 'view') { camTheta = -0.34; camPhi = 1.30; camDist = 610; camTarget.set(88, 16, 0); updateCamera(); draw(); }
-  if (k === 'help') msg('快捷键：F 正视 / S 侧视 / T 俯视 / G 网格 / R 基准 / W 线框');
+  ev.stopPropagation();
+  if (menuPop) { closeMenu(); return; }
+  const rect = b.getBoundingClientRect();
+  menuPop = document.createElement('div');
+  menuPop.className = 'menu-pop';
+  menuPop.style.left = rect.left + 'px';
+  menuPop.style.top = (rect.bottom + 6) + 'px';
+  menuPop.innerHTML = (MENU_DEF[b.dataset.menu] || []).map(([label, act]) => '<button data-act="' + act + '">' + label + '</button>').join('');
+  document.body.appendChild(menuPop);
+});
+document.addEventListener('click', (ev) => {
+  if (!menuPop) return;
+  const it = ev.target.closest('.menu-pop button');
+  if (!it) { closeMenu(); return; }
+  const act = it.dataset.act;
+  closeMenu();
+  const clickId = (id) => { const el = $(id); if (el) el.click(); };
+  const toggle = (name) => { const el = document.querySelector('[data-toggle="' + name + '"]'); if (el) el.click(); };
+  if (act === 'new') return clickId('btnNew');
+  if (act === 'open') return clickId('btnOpen');
+  if (act === 'save') return clickId('btnSave');
+  if (act === 'obj') return clickId('btnObj');
+  if (act === 'tex') return clickId('btnTex');
+  if (act === 'pkg') return clickId('btnPkg');
+  if (act === 'jar') return clickId('btnJar');
+  if (act === 'ses') return clickId('btnSes');
+  if (act === 'undo') return clickId('btnUndo');
+  if (act === 'redo') return clickId('btnRedo');
+  if (act === 'rebuild') { syncFields(); rebuild(); msg('已按当前参数重建'); return; }
+  if (act === 'clearx') { doc.extras.length = 0; rebuild(); histPush(true); toast('已清空附加件'); return; }
+  if (act === 'front' || act === 'side' || act === 'top') {
+    const el = document.querySelector('.vbar [data-view="' + act + '"]');
+    if (el) el.click();
+    return;
+  }
+  if (act === 'reset') { camTheta = -0.34; camPhi = 1.30; camDist = 610; camTarget.set(88, 16, 0); updateCamera(); draw(); return; }
+  if (act === 'showall') {
+    for (const g of GROUPS) { doc.visible[g[0]] = true; if (meshes[g[0]]) meshes[g[0]].visible = true; }
+    renderTree(); paintSelection(); draw(); updateStatus(); toast('已显示全部 8 组');
+    return;
+  }
+  if (act === 'resetparams') {
+    doc.params = Object.assign({}, DEFAULT_ALL);
+    rebuild(); syncFields(); histPush(true); toast('参数已重置为默认');
+    return;
+  }
+  if (act === 'compat') {
+    compatMode = !compatMode;
+    for (const k of Object.keys(mats)) { mats[k].dispose(); delete mats[k]; }
+    rebuild();
+    toast(compatMode ? '兼容模式：纯色材质（还是看不到就是显卡驱动问题）' : '已回到贴图材质');
+    return;
+  }
+  if (act === 'ref' || act === 'grid' || act === 'wire' || act === 'handles') return toggle(act);
+  if (act === 'keys') { msg('快捷键：F 正视 / S 侧视 / T 俯视 / G 网格 / R 基准 / W 线框'); return; }
+  if (act === 'fb') { openFeedback(); return; }
+  if (act === 'repo') { if (window.api && window.api.openUrl) window.api.openUrl(FEEDBACK_REPO + '/releases'); return; }
 });
 
 // 快捷键

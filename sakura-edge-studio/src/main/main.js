@@ -615,16 +615,22 @@ async function checkGithub(gh, token) {
 
   if (!tag) throw new Error(apiError ? '读不到 release：' + apiError : '这个仓库还没有发布 release');
 
-  const version = String(tag).replace(/^v/i, '');
+  /* 两个工具共用一个仓库，以附件名里的版本为准，避免拿错包或误报版本 */
+  let version = String(tag).replace(/^v/i, '');
+  if (size && assetUrl) {
+    const m = String(assetUrl).match(/SakuraEdgeStudio-([0-9][0-9A-Za-z.]*)-Windows/i);
+    if (m) version = m[1];
+  }
   if (!/^[0-9]/.test(version)) throw new Error(`release tag「${tag}」不像版本号，建议用 v1.14.2 这种格式`);
   if (!assetUrl) {
     // 没拿到资产信息时的约定地址：附件名固定为 SakuraEdgeStudio-<版本>-Windows-x64.zip
     assetUrl = `https://github.com/${gh.owner}/${gh.repo}/releases/download/${tag}/SakuraEdgeStudio-${version}-Windows-x64.zip`;
   }
+  const current = app.getVersion();
   return {
     ok: true,
-    current: app.getVersion(),
-    newer: cmpVer(version, app.getVersion()) > 0,
+    current,
+    newer: cmpVer(version, current) > 0,
     meta: { version, url: assetUrl, assetApi, size, notes, channel, via: assetUrl.includes('/releases/download/') ? 'github' : 'github-api' },
     hint: apiError && assetUrl.includes('/releases/download/') ? 'GitHub API 不可用（' + apiError + '），按约定地址拼的下载链接' : '',
   };
