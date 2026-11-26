@@ -283,6 +283,18 @@ function rebuild(opts) {
     mesh.castShadow = false;
     root.add(mesh);
     exMeshes.push(mesh);
+    // 方块：加一圈亮色描边，深色刀身上、从任何角度都能一眼认出来
+    if (e.type === 'cube') {
+      const eg = new THREE.LineSegments(
+        new THREE.EdgesGeometry(e.geo, 18),
+        new THREE.LineBasicMaterial({ color: 0xffd27a, transparent: true, opacity: 0.9 })
+      );
+      eg.name = 'edge:cube';
+      eg.matrixAutoUpdate = false;
+      eg.matrix.copy(mesh.matrix);
+      root.add(eg);
+      exMeshes.push(eg);
+    }
   }
   for (const e of doc.extras) {
     if (e.type !== 'import') continue;
@@ -1106,11 +1118,13 @@ if ($('addRow')) {
     if (!b) return;
     const meta = EXTRA_LIST.find((x) => x.type === b.dataset.add) || {};
     const seed = { type: b.dataset.add, t: meta.defT == null ? 0.5 : meta.defT, scale: meta.defK == null ? 1 : meta.defK };
-    if (b.dataset.add === 'cube') Object.assign(seed, { w: 12, h: 10, d: 8, oy: 6, rot: 0, slot: 'blade' });
+    if (b.dataset.add === 'cube') Object.assign(seed, { w: 24, h: 20, d: 14, oz: 26, rot: 0, slot: 'blade' });
     doc.extras.push(seed);
     rebuild();
     histPush(true);
-    msg('已加 ' + (EXTRA_LIST.find((x) => x.type === b.dataset.add) || {}).label);
+    msg(b.dataset.add === 'cube'
+      ? '已加方块：已挪到刀身外侧，拖青色球可任意移动，X/Y/Z 可手改'
+      : '已加 ' + (EXTRA_LIST.find((x) => x.type === b.dataset.add) || {}).label);
   });
   $('extraList').addEventListener('click', (ev) => {
     const d = ev.target.closest('[data-del]');

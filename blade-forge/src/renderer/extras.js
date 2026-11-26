@@ -9,7 +9,7 @@ export const EXTRA_LIST = [
   { type: 'hanger', label: '鞘挂饰', target: 'blade', color: 0x9aa7b3, defT: 0.88, defK: 1.0, desc: '鞘口双金属环：位置=沿刀身' },
   { type: 'glow', label: '刀光', target: 'effect', color: 0x6fe8da, defT: 0.35, defK: 1.0, desc: '刃口光带：位置=光带起点' },
   { type: 'sparks', label: '火花', target: 'effect', color: 0xffc061, defT: 0.45, defK: 1.0, desc: '光点：位置=分布起点' },
-  { type: 'cube', label: '方块', target: 'blade', color: 0x8f979f, defT: 0.5, defK: 1.0, desc: '自由方块：位置/宽高厚/倾斜都能改，可当护手、挂件、血槽' },
+  { type: 'cube', label: '方块', target: 'blade', color: 0xff8c1a, defT: 0.5, defK: 1.0, desc: '自由方块：位置/宽高厚/倾斜都能改，可当护手、挂件、血槽' },
 ];
 
 function quadStrip(pos, uv, idx, path, wFn, vTag) {
@@ -171,9 +171,9 @@ export function cubePos(p, e) {
 /* 自由方块：中心贴在刀身 t 处，可上下偏移、可倾斜，尺寸可调 */
 function buildCube(p, t, scale, e) {
   const pos = [], uv = [], idx = [];
-  const hx = (e && e.w != null ? e.w : 12) * 0.5 * scale;
-  const hy = (e && e.h != null ? e.h : 10) * 0.5 * scale;
-  const hz = (e && e.d != null ? e.d : 8) * 0.5 * scale;
+  const hx = (e && e.w != null ? e.w : 24) * 0.5 * scale;
+  const hy = (e && e.h != null ? e.h : 20) * 0.5 * scale;
+  const hz = (e && e.d != null ? e.d : 14) * 0.5 * scale;
   const at = cubePos(p, e && e.px != null ? e : Object.assign({}, e, { t: t }));
   const cx = at.x, cy = at.y, cz = at.z;
   const rot = e && e.rot ? e.rot : 0;
