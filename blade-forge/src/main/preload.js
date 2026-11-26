@@ -13,6 +13,8 @@ contextBridge.exposeInMainWorld('api', {
   readObj: (p) => ipcRenderer.invoke('obj:read', p),
   info: () => ipcRenderer.invoke('app:info'),
   openUrl: (url) => ipcRenderer.invoke('shell:openUrl', url),
+  setGpu: (hardware) => ipcRenderer.invoke('gpu:set', hardware),
+  relaunch: () => ipcRenderer.invoke('gpu:relaunch'),
   updateState: () => ipcRenderer.invoke('update:state'),
   updateSave: (patch) => ipcRenderer.invoke('update:save', patch),
   updateCheck: (source) => ipcRenderer.invoke('update:check', source),

@@ -28,7 +28,7 @@ const FIELDS = [
   ['grz', '镡横向半径', 3, 16, 0.1],
   ['gthick', '镡厚', 1, 6, 0.1],
   ['spad', '鞘壁余量', 0.5, 4, 0.1],
-  ['slen', '鞘长占比', 0.4, 1, 0.01],
+  ['slen', '鞘长占比', 0.4, 1.12, 0.01],
   ['gshape', '镡形状', 0, 3, 1],
   ['hsides', '柄棱数', 6, 12, 1],
   ['wrapCount', '缠绳圈数', 1, 12, 1],
@@ -1539,7 +1539,7 @@ const MENU_DEF = {
   file: [['新建', 'new'], ['打开工程', 'open'], ['保存工程', 'save'], ['导出 OBJ', 'obj'], ['导出贴图', 'tex'], ['导出资源包', 'pkg'], ['生成附属包', 'jar'], ['送去工坊', 'ses']],
   edit: [['撤销', 'undo'], ['重做', 'redo'], ['按当前参数重建几何', 'rebuild'], ['清空附加件', 'clearx']],
   view: [['正视', 'front'], ['侧视', 'side'], ['俯视', 'top'], ['重置视角', 'reset'], ['全部显示组', 'showall'], ['重置参数', 'resetparams'], ['基础材质（最保险）', 'basic'], ['立体光照材质', 'lit'], ['纯色诊断模式', 'compat'], ['原版基准', 'ref'], ['网格', 'grid'], ['线框', 'wire'], ['手柄', 'handles']],
-  help: [['快捷键', 'keys'], ['反馈 / 提建议', 'fb'], ['GitHub 仓库', 'repo']],
+  help: [['软件渲染（最稳，重启生效）', 'gpu-soft'], ['硬件加速（可能有驱动问题，重启生效）', 'gpu-hw'], ['快捷键', 'keys'], ['反馈 / 提建议', 'fb'], ['GitHub 仓库', 'repo']],
 };
 function closeMenu() { if (menuPop) { menuPop.remove(); menuPop = null; } }
 document.querySelector('.menu').addEventListener('click', (ev) => {
@@ -1605,6 +1605,14 @@ document.addEventListener('click', (ev) => {
   }
   if (act === 'ref' || act === 'grid' || act === 'wire' || act === 'handles') return toggle(act);
   if (act === 'keys') { msg('快捷键：F 正视 / S 侧视 / T 俯视 / G 网格 / R 基准 / W 线框'); return; }
+  if (act === 'gpu-soft' || act === 'gpu-hw') {
+    if (window.api && window.api.setGpu) {
+      window.api.setGpu(act === 'gpu-hw');
+      toast('已设置，正在重启…');
+      setTimeout(() => { if (window.api.relaunch) window.api.relaunch(); }, 700);
+    } else toast('当前环境不支持切换');
+    return;
+  }
   if (act === 'fb') { openFeedback(); return; }
   if (act === 'repo') { if (window.api && window.api.openUrl) window.api.openUrl(FEEDBACK_REPO + '/releases'); return; }
 });

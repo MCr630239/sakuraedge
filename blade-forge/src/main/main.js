@@ -3,6 +3,27 @@ const path = require('path');
 const fs = require('fs');
 
 let win = null;
+let SOFT_RENDER = false;
+
+/* 老 Intel 核显（HD 4000/4600 等）在 Chromium 的 D3D 路径上会丢三角形面，
+   只剩线和点能画。默认走软件渲染（SwiftShader）最稳；--gpu 或设置里开启可恢复硬件。 */
+function gpuPrefPath() {
+  try { return path.join(app.getPath('userData'), 'gpu.json'); } catch (_) { return null; }
+}
+function hardwarePreferred() {
+  if (process.argv.includes('--gpu')) return true;
+  if (process.argv.includes('--sw')) return false;
+  try {
+    const raw = fs.readFileSync(gpuPrefPath(), 'utf8');
+    return JSON.parse(raw).hardware === true;
+  } catch (_) { return false; }
+}
+if (hardwarePreferred()) {
+  SOFT_RENDER = false;
+} else {
+  app.disableHardwareAcceleration();
+  SOFT_RENDER = true;
+}
 
 function createWindow() {
   win = new BrowserWindow({
@@ -342,7 +363,16 @@ ipcMain.handle('app:info', () => ({
   version: app.getVersion(),
   platform: process.platform,
   electron: process.versions.electron,
+  softRender: SOFT_RENDER,
 }));
+ipcMain.handle('gpu:set', (_e, hardware) => {
+  try { fs.writeFileSync(gpuPrefPath(), JSON.stringify({ hardware: !!hardware })); } catch (_) { return false; }
+  return true;
+});
+ipcMain.handle('gpu:relaunch', () => {
+  app.relaunch({ args: process.argv.slice(1).filter((a) => a !== '--gpu' && a !== '--sw') });
+  app.exit(0);
+});
 
 /* 只允许打开本项目的 GitHub 页面，避免被任意 URL 利用 */
 const ALLOWED_URL_PREFIXES = ['https://github.com/MCr630239/', 'https://www.bilibili.com/'];

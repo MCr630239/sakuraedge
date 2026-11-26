@@ -24,7 +24,7 @@ export const DEFAULT_PARAMS = {
   grz: 7.4,      // 镡横向半径
   gthick: 2.6,   // 镡厚
   spad: 1.7,     // 鞘壁余量
-  slen: 0.9,     // 鞘长占比
+  slen: 1.0,     // 鞘长占比（1 = 与刃同长，可到 1.12 包住刃尖）
   // 部件增删：false = 这件不生成（直接省掉几何，不是隐藏）
   bladeOn: true,
   guardOn: true,
@@ -88,7 +88,7 @@ const FIELDS = [
   ['grz', '镡横向半径', 3, 16, 0.1],
   ['gthick', '镡厚', 1, 6, 0.1],
   ['spad', '鞘壁余量', 0.5, 4, 0.1],
-  ['slen', '鞘长占比', 0.4, 1, 0.01],
+  ['slen', '鞘长占比', 0.4, 1.12, 0.01],
 ];
 
 const PRESETS = {
