@@ -1,7 +1,7 @@
 {
- "version": "1.14.12",
- "url": "https://aka.doubaocdn.com/s/SXehK7XVKK",
- "size": 116877744,
+ "version": "1.14.13",
+ "url": "https://aka.doubaocdn.com/s/oiurJKcHWA",
+ "size": 116878249,
  "channel": "stable",
- "notes": "与 Blade Forge 0.19.0 配套版本"
+ "notes": "与 Blade Forge 0.19.1 配套；更新下载同样升级为 8 路动态分片"
 }

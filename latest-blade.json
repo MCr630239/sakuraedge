@@ -1,7 +1,7 @@
 {
- "version": "0.19.0",
- "url": "https://aka.doubaocdn.com/s/24ScW4w94k",
- "size": 119972641,
+ "version": "0.19.1",
+ "url": "https://aka.doubaocdn.com/s/VQZYp0YFRO",
+ "size": 119973221,
  "channel": "stable",
- "notes": "方块改亮橙色、默认放大到 24x20x14 并凸出刀身外侧（原来被刀身包住看不见），加亮黄描边；wine 10 实机测试通过"
+ "notes": "更新下载再提速：8 路并发 + 4MB 小片动态抢占（慢连接不再拖长尾）、单片失败自动重试 3 次、下载完成后校验大小、进度条 120ms 节流并显示实时 MB/s"
 }

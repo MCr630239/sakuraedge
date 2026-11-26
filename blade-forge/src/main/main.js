@@ -435,7 +435,7 @@ function fetchText(url, depth = 0, headers = null) {
     const lib = /^https:/i.test(url) ? https : http;
     let req;
     try {
-      req = lib.get(url, { timeout: 20000, headers: headers || undefined }, (res) => {
+      req = lib.get(url, { timeout: 8000, headers: headers || undefined }, (res) => {
         if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
           res.resume();
           const next = new URL(res.headers.location, url).toString();
@@ -530,24 +530,26 @@ function probeTotal(url) {
   });
 }
 
-function fetchRange(url, start, end, dest, onBytes, depth = 0) {
+/* 分片下载：返回本片真正写入的字节数，重试不会重复累加进度 */
+function fetchRange(url, start, end, dest, depth = 0) {
   return new Promise((resolve, reject) => {
     if (depth > 4) return reject(new Error('重定向太多'));
     const lib = /^https:/i.test(url) ? https : http;
-    const req = lib.get(url, { timeout: 30000, headers: { Range: 'bytes=' + start + '-' + end } }, (res) => {
+    const req = lib.get(url, { timeout: 20000, headers: { Range: 'bytes=' + start + '-' + end } }, (res) => {
       if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
         res.resume();
-        return fetchRange(new URL(res.headers.location, url).toString(), start, end, dest, onBytes, depth + 1).then(resolve, reject);
+        return fetchRange(new URL(res.headers.location, url).toString(), start, end, dest, depth + 1).then(resolve, reject);
       }
       if (res.statusCode !== 206 && res.statusCode !== 200) {
         res.resume();
         return reject(new Error('分块返回 ' + res.statusCode));
       }
+      let got = 0;
       const out = fs.createWriteStream(dest);
-      res.on('data', (c) => onBytes(c.length));
+      res.on('data', (c) => { got += c.length; });
       res.on('error', reject);
       out.on('error', reject);
-      out.on('finish', resolve);
+      out.on('finish', () => resolve(got));
       res.pipe(out);
     });
     req.on('timeout', () => req.destroy(new Error('分块超时')));
@@ -555,45 +557,62 @@ function fetchRange(url, start, end, dest, onBytes, depth = 0) {
   });
 }
 
-async function downloadFast(url, dest, onProgress, threads = 4) {
+/* 分块并发下载：4MB 小片 + 动态队列，谁先下完谁抢下一片，慢连接不会拖长尾；单片失败重试 3 次 */
+const FAST_CHUNK = 4 * 1024 * 1024;
+const FAST_THREADS = 8;
+
+async function downloadFast(url, dest, onProgress) {
   let total = 0;
   try { total = await probeTotal(url); } catch (_) { return downloadTo(url, dest, onProgress); }
-  if (!total || total < 4 * 1024 * 1024) return downloadTo(url, dest, onProgress);
-  const chunk = Math.ceil(total / threads);
-  const parts = [];
+  if (!total) return downloadTo(url, dest, onProgress);
+  const pieces = [];
+  for (let s = 0; s < total; s += FAST_CHUNK) pieces.push([s, Math.min(total - 1, s + FAST_CHUNK - 1)]);
+  const partFiles = pieces.map((_, i) => path.join(updDir(), 'bfpart' + i + '.bin'));
   let got = 0;
+  let failed = false;
   const tick = (n) => { got += n; if (onProgress) onProgress(got, total); };
-  const jobs = [];
-  for (let i = 0; i < threads; i++) {
-    const start = i * chunk;
-    if (start >= total) break;
-    const end = Math.min(total - 1, start + chunk - 1);
-    const part = path.join(updDir(), 'part' + i + '.bin');
-    parts.push(part);
-    jobs.push(fetchRange(url, start, end, part, tick));
-  }
+  let cursor = 0;
+  const worker = async () => {
+    while (!failed && cursor < pieces.length) {
+      const i = cursor++;
+      const s = pieces[i][0], en = pieces[i][1];
+      let done = false;
+      for (let attempt = 0; attempt < 3 && !done; attempt++) {
+        try {
+          const n = await fetchRange(url, s, en, partFiles[i]);
+          tick(n);
+          done = true;
+        } catch (err) {
+          if (attempt === 2) { failed = true; throw err; }
+          await new Promise((r) => setTimeout(r, 400));
+        }
+      }
+    }
+  };
   try {
-    await Promise.all(jobs);
-  } catch (e) {
-    for (const p of parts) { try { fs.rmSync(p, { force: true }); } catch (_) {} }
+    await Promise.all(Array.from({ length: Math.min(FAST_THREADS, pieces.length) }, () => worker()));
+  } catch (_) {
+    for (const p of partFiles) { try { fs.rmSync(p, { force: true }); } catch (e) {} }
     return downloadTo(url, dest, onProgress);
   }
   await new Promise((resolve, reject) => {
     const out = fs.createWriteStream(dest);
     let i = 0;
     const next = () => {
-      if (i >= parts.length) { out.end(); return; }
+      if (i >= partFiles.length) { out.end(); return; }
       const idx = i;
-      const rs = fs.createReadStream(parts[idx]);
       i += 1;
+      const rs = fs.createReadStream(partFiles[idx]);
       rs.pipe(out, { end: false });
-      rs.on('end', () => { try { fs.rmSync(parts[idx], { force: true }); } catch (_) {} next(); });
+      rs.on('end', () => { try { fs.rmSync(partFiles[idx], { force: true }); } catch (e) {} next(); });
       rs.on('error', reject);
     };
     out.on('finish', resolve);
     out.on('error', reject);
     next();
   });
+  const st = fs.statSync(dest);
+  if (st.size !== total) throw new Error('下载不完整：' + st.size + '/' + total + ' 字节');
   return total;
 }
 
@@ -832,9 +851,15 @@ ipcMain.handle('update:download', async (e, arg) => {
     }
     fs.mkdirSync(updDir(), { recursive: true });
     const dest = path.join(updDir(), 'BladeForge-update.zip');
+    let lastEmit = 0, lastGot = 0, spd = 0;
     const onProg = (got, total) => {
+      const now = Date.now();
+      // 节流：IPC 太密会反过来拖慢下载
+      if (now - lastEmit < 120 && got < total) return;
+      if (lastEmit && now > lastEmit) spd = (got - lastGot) / ((now - lastEmit) / 1000);
+      lastEmit = now; lastGot = got;
       try {
-        e.sender.send('update:progress', { phase: 'download', got, total, pct: total ? got / total : 0 });
+        e.sender.send('update:progress', { phase: 'download', got, total, pct: total ? got / total : 0, speed: spd });
       } catch (_) {}
     };
     const bytes = headers ? await downloadTo(url, dest, onProg) : await downloadFast(url, dest, onProg);

@@ -2052,7 +2052,11 @@ async function initUpd(silent) {
       window.api.onUpdateProgress((p) => {
         if (!p || p.phase !== 'download') return;
         const now = Date.now();
-        if (UPD.lastT && now - UPD.lastT > 250) {
+        if (p.speed && isFinite(p.speed)) {
+          UPD.speed = p.speed;
+          UPD.lastT = now;
+          UPD.lastGot = p.got;
+        } else if (UPD.lastT && now - UPD.lastT > 250) {
           UPD.speed = (p.got - UPD.lastGot) / ((now - UPD.lastT) / 1000);
           UPD.lastT = now;
           UPD.lastGot = p.got;
