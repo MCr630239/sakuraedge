@@ -1,7 +1,7 @@
 {
- "version": "0.18.8",
- "url": "https://aka.doubaocdn.com/s/YkvoVtYTGh",
- "size": 119970600,
+ "version": "0.18.9",
+ "url": "https://aka.doubaocdn.com/s/p37LjIoaaJ",
+ "size": 119972213,
  "channel": "stable",
- "notes": "更新下载改为 CDN 多线程（4 路分块），并显示速度；Blockbench 风格界面 + 自由方块"
+ "notes": "方块可自由放到任意位置（X/Y/Z 三轴滑杆 + 视口拖动）；新增视图「居中」按钮与 Home 键，模型被平移出视野会提示"
 }

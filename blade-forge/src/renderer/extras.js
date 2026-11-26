@@ -157,16 +157,25 @@ function buildSparks(p, t, k) {
   return finish(pos, uv, idx, 'sparks');
 }
 
+/* 方块位置：给了 px/py/pz 就用绝对坐标（随便放到哪），否则按沿刀 t 推导 */
+export function cubePos(p, e) {
+  if (e && e.px != null) return { x: e.px, y: e.py || 0, z: e.pz || 0 };
+  const t = Math.max(0, Math.min(1.15, e && e.t != null ? e.t : 0.5));
+  return {
+    x: p.len * t + (e && e.ox ? e.ox : 0),
+    y: p.sori * t * t + (e && e.oy ? e.oy : 0),
+    z: e && e.oz ? e.oz : 0,
+  };
+}
+
 /* 自由方块：中心贴在刀身 t 处，可上下偏移、可倾斜，尺寸可调 */
 function buildCube(p, t, scale, e) {
   const pos = [], uv = [], idx = [];
   const hx = (e && e.w != null ? e.w : 12) * 0.5 * scale;
   const hy = (e && e.h != null ? e.h : 10) * 0.5 * scale;
   const hz = (e && e.d != null ? e.d : 8) * 0.5 * scale;
-  const tt = Math.max(0, Math.min(1.15, t));
-  const cx = p.len * tt + (e && e.ox ? e.ox : 0);
-  const cy = p.sori * tt * tt + (e && e.oy ? e.oy : 0);
-  const cz = e && e.oz ? e.oz : 0;
+  const at = cubePos(p, e && e.px != null ? e : Object.assign({}, e, { t: t }));
+  const cx = at.x, cy = at.y, cz = at.z;
   const rot = e && e.rot ? e.rot : 0;
   const c = Math.cos(rot), s = Math.sin(rot);
   const base = pos.length / 3;

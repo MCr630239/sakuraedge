@@ -1,6 +1,6 @@
 import * as THREE from './vendor/three.module.js';
 import { buildGeometries, DEFAULT_PARAMS, makeTextureCanvas, geomsToObj, mergeGeos, uvIn, finish, R_BLADE, TEX_REGIONS, makeMtl } from './geometry.js';
-import { buildExtras, mergeExtras, EXTRA_LIST } from './extras.js';
+import { buildExtras, mergeExtras, EXTRA_LIST, cubePos } from './extras.js';
 
 const GROUPS = [
   ['blade', '刀 + 镡 + 柄', 0x8794a8],
@@ -302,6 +302,7 @@ function rebuild(opts) {
   updateStatus();
   updateHandles();
   draw();
+  checkViewSoon();
 }
 
 // ---------- 外部元素（OBJ 导入挂件）----------
@@ -663,6 +664,10 @@ function panBy(dx, dy, dz) {
   camTarget.addScaledVector(right, dx * k);
   camTarget.addScaledVector(upv, dy * k);
   if (dz) camTarget.y += dz * camDist * 0.06;
+  const p = doc.params, lim = Math.max(300, (p.len + p.hlen) * 1.6);
+  camTarget.x = Math.max(-lim, Math.min(lim * 2, camTarget.x));
+  camTarget.y = Math.max(-lim, Math.min(lim, camTarget.y));
+  camTarget.z = Math.max(-lim, Math.min(lim, camTarget.z));
   updateCamera(); draw();
 }
 
@@ -677,6 +682,27 @@ function updateCamera() {
 }
 
 function draw() { renderer.render(scene, cam); }
+
+/* 模型是否还在画面里：不在就提示「居中」，免得以为模型丢了 */
+const _frustum = new THREE.Frustum();
+const _projM = new THREE.Matrix4();
+const _bbox = new THREE.Box3();
+function modelInView() {
+  if (!root.children.length) return true;
+  cam.updateMatrixWorld();
+  _projM.multiplyMatrices(cam.projectionMatrix, cam.matrixWorldInverse);
+  _frustum.setFromProjectionMatrix(_projM);
+  _bbox.setFromObject(root);
+  if (_bbox.isEmpty()) return true;
+  return _frustum.intersectsBox(_bbox);
+}
+let viewChkTimer = 0;
+function checkViewSoon() {
+  clearTimeout(viewChkTimer);
+  viewChkTimer = setTimeout(() => {
+    if (!modelInView()) msg('模型不在视野内 —— 点视图栏的「居中」或按 Home 键');
+  }, 220);
+}
 
 // ---------- 原版基准 ----------
 const REF = { len: 253, wid: 10, sori: 22, hlen: 93 };
@@ -723,6 +749,18 @@ for (const d of HANDLE_DEFS) {
 
 const cubeHandleMat = new THREE.MeshBasicMaterial({ color: 0x6fe8da, transparent: true, opacity: 0.95 });
 const cubeHandles = [];
+function setCubeAxis(i, axis, v) {
+  const e = doc.extras[i];
+  if (!e || e.type !== 'cube') return;
+  if (e.px == null) {
+    const pos = cubePos(doc.params, e);
+    e.px = pos.x; e.py = pos.y; e.pz = pos.z;
+  }
+  if (axis === 0) e.px = v;
+  else if (axis === 1) e.py = v;
+  else e.pz = v;
+}
+
 function layoutCubeHandles(p) {
   const cubes = [];
   doc.extras.forEach((e, i) => { if (e.type === 'cube') cubes.push({ e: e, i: i }); });
@@ -736,19 +774,21 @@ function layoutCubeHandles(p) {
   cubeHandles.forEach((m, k) => {
     if (k >= cubes.length) { m.visible = false; return; }
     const e = cubes[k].e;
-    const tt = Math.max(0, Math.min(1.15, e.t == null ? 0.5 : e.t));
+    const at = cubePos(p, e);
     m.userData.idx = cubes[k].i;
     m.visible = handleGroup.visible !== false;
-    m.position.set(p.len * tt + (e.ox || 0), p.sori * tt * tt + (e.oy || 0), (e.oz || 0) + ((e.d || 8) * 0.5 * (e.scale || 1)) + 4);
+    m.position.set(at.x, at.y, at.z + ((e.d || 8) * 0.5 * (e.scale || 1)) + 4);
   });
 }
 
 function syncExtraSliders() {
   doc.extras.forEach((e, i) => {
-    const et = document.querySelector('[data-et="' + i + '"]');
-    if (et) et.value = String(e.t == null ? 0.9 : e.t);
-    const eo = document.querySelector('[data-eoy="' + i + '"]');
-    if (eo) eo.value = String(e.oy == null ? 0 : e.oy);
+    if (e.type !== 'cube') return;
+    const at = cubePos(doc.params, e);
+    [['epx', at.x], ['epy', at.y], ['epz', at.z]].forEach(([k, v]) => {
+      const el = document.querySelector('[data-' + k + '="' + i + '"]');
+      if (el) el.value = String(Math.round(v));
+    });
   });
 }
 
@@ -823,9 +863,9 @@ canvas.addEventListener('pointermove', function (ev) {
   if (drag.key === 'cube') {
     const e = doc.extras[drag.idx];
     if (!e) return;
-    const tt = Math.max(0, Math.min(1.15, p.x / (pa.len || 1)));
-    e.t = Math.round(tt * 100) / 100;
-    e.oy = Math.round(p.y - pa.sori * tt * tt);
+    if (e.px == null) { const at = cubePos(pa, e); e.px = at.x; e.py = at.y; e.pz = at.z; }
+    e.px = Math.round(p.x);
+    e.py = Math.round(p.y);
     syncExtraSliders();
     rebuild({ keepExtrasUI: true });
     histPush(false);
@@ -978,13 +1018,15 @@ function renderExtras() {
     }
     if (e.type === 'cube') {
       const c = (e.color == null ? 0x8f979f : e.color).toString(16).padStart(6, '0');
+      const pos = cubePos(doc.params, e);
       return '<div class="extrait"><div class="hd"><span class="sw" style="background:#' + c + '"></span>方块'
         + '<span class="x" data-del="' + i + '">×</span></div>'
-        + '<div class="sl"><span>沿刀</span><input type="range" data-et="' + i + '" min="0" max="1.15" step="0.01" value="' + (e.t == null ? 0.5 : e.t) + '" /></div>'
+        + '<div class="sl"><span>X</span><input type="range" data-epx="' + i + '" min="-320" max="420" step="1" value="' + Math.round(pos.x) + '" /></div>'
+        + '<div class="sl"><span>Y</span><input type="range" data-epy="' + i + '" min="-160" max="220" step="1" value="' + Math.round(pos.y) + '" /></div>'
+        + '<div class="sl"><span>Z</span><input type="range" data-epz="' + i + '" min="-120" max="120" step="1" value="' + Math.round(pos.z) + '" /></div>'
         + '<div class="sl"><span>宽</span><input type="range" data-ew="' + i + '" min="1" max="80" step="0.5" value="' + (e.w == null ? 12 : e.w) + '" /></div>'
         + '<div class="sl"><span>高</span><input type="range" data-eh="' + i + '" min="1" max="80" step="0.5" value="' + (e.h == null ? 10 : e.h) + '" /></div>'
         + '<div class="sl"><span>厚</span><input type="range" data-ed="' + i + '" min="1" max="40" step="0.5" value="' + (e.d == null ? 8 : e.d) + '" /></div>'
-        + '<div class="sl"><span>上下</span><input type="range" data-eoy="' + i + '" min="-50" max="50" step="1" value="' + (e.oy == null ? 0 : e.oy) + '" /></div>'
         + '<div class="sl"><span>倾斜</span><input type="range" data-ero="' + i + '" min="-1.3" max="1.3" step="0.02" value="' + (e.rot == null ? 0 : e.rot) + '" /></div>'
         + '<div class="sl"><span>分组</span><select data-eslot="' + i + '"><option value="blade"' + ((e.slot || 'blade') === 'blade' ? ' selected' : '')
         + '>blade</option><option value="effect"' + (e.slot === 'effect' ? ' selected' : '') + '>effect</option></select></div></div>';
@@ -1087,6 +1129,9 @@ if ($('addRow')) {
     else if (t.matches('[data-ed]')) doc.extras[Number(t.dataset.ed)].d = Number(t.value);
     else if (t.matches('[data-eoy]')) doc.extras[Number(t.dataset.eoy)].oy = Number(t.value);
     else if (t.matches('[data-ero]')) doc.extras[Number(t.dataset.ero)].rot = Number(t.value);
+    else if (t.matches('[data-epx]')) setCubeAxis(Number(t.dataset.epx), 0, Number(t.value));
+    else if (t.matches('[data-epy]')) setCubeAxis(Number(t.dataset.epy), 1, Number(t.value));
+    else if (t.matches('[data-epz]')) setCubeAxis(Number(t.dataset.epz), 2, Number(t.value));
     else return;
     rebuild({ keepExtrasUI: true });
     histPush(false);
@@ -1230,6 +1275,14 @@ document.querySelector('.vbar').addEventListener('click', (ev) => {
   const v = ev.target.closest('[data-view]');
   if (v) {
     const k = v.dataset.view;
+    if (k === 'frame') {
+      autoFrame();
+      setViewLabel('透视视图');
+      setZoomLabel();
+      document.querySelectorAll('.vbar [data-view]').forEach((el) => el.classList.toggle('on', el === v));
+      msg('已把模型拉回视野中央');
+      return;
+    }
     if (k === 'front') { camTheta = 0; camPhi = Math.PI / 2 - 0.04; autoFrame(); setViewLabel('正视图'); setZoomLabel(); }
     if (k === 'side') { camTheta = -1.05; camPhi = 1.24; camDist = 700; }
     if (k === 'top') { camTheta = 0; camPhi = 0.30; camDist = 780; }
@@ -1694,6 +1747,14 @@ window.addEventListener('keydown', (ev) => {
     document.querySelector('.vbar [data-view="' + btn + '"]').click();
     return;
   }
+  if (k === 'home') {
+    ev.preventDefault();
+    autoFrame();
+    setViewLabel('透视视图');
+    setZoomLabel();
+    msg('已把模型拉回视野中央');
+    return;
+  }
   const panKeys = {
     arrowleft: [-1, 0, 0], a: [-1, 0, 0], arrowright: [1, 0, 0], d: [1, 0, 0],
     arrowup: [0, 1, 0], q: [0, 1, 0], arrowdown: [0, -1, 0], e: [0, -1, 0],
@@ -1797,7 +1858,8 @@ document.querySelectorAll('.splitter').forEach((sp) => {
 
 document.querySelector('.vbar').addEventListener('click', (ev) => {
   const b = ev.target.closest('[data-view]');
-  if (b) setViewLabel({ front: '正视图', side: '侧视图', top: '俯视图' }[b.dataset.view] || '视图');
+  const lbl = { front: '正视图', side: '侧视图', top: '俯视图' }[b && b.dataset.view];
+  if (lbl) setViewLabel(lbl);
 });
 
 const treeSearch = $('treeSearch');
