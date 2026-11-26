@@ -854,9 +854,15 @@ ipcMain.handle('update:download', async (e, arg) => {
     let headers = null;
     // 增量包：清单里给了 from=当前版本 的差异包，就只下变了的那些文件
     let isDelta = false;
-    if (meta.delta && meta.delta.url && String(meta.delta.from || '') === app.getVersion()) {
-      url = meta.delta.url;
+    let dSize = 0;
+    const dCands = [];
+    if (meta.delta && meta.delta.url) dCands.push(meta.delta);
+    if (Array.isArray(meta.deltas)) for (const d of meta.deltas) if (d && d.url) dCands.push(d);
+    const dPick = dCands.find((d) => String(d.from || '') === app.getVersion());
+    if (dPick) {
+      url = dPick.url;
       isDelta = true;
+      dSize = Number(dPick.size || 0);
     }
     if (!isDelta && token && meta.assetApi && /api\.github\.com/i.test(meta.assetApi)) {
       url = meta.assetApi;
@@ -870,7 +876,7 @@ ipcMain.handle('update:download', async (e, arg) => {
     const dest = path.join(updDir(), 'BladeForge-update' + (isDelta ? '-delta' : '') + '.zip');
     // 秒装：上次已经下完（大小一致）就直接用，不重下
     try {
-      const want = Number(isDelta ? ((meta.delta && meta.delta.size) || 0) : (meta.size || 0));
+      const want = Number(isDelta ? (dSize || (meta.delta && meta.delta.size) || 0) : (meta.size || 0));
       if (want > 0 && fs.existsSync(dest) && fs.statSync(dest).size === want) {
         return { ok: true, path: dest, bytes: want, cached: true, delta: isDelta };
       }

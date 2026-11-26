@@ -1,7 +1,7 @@
 {
   "name": "blade-forge",
   "productName": "BladeForge",
-  "version": "0.19.4",
+  "version": "0.19.5",
   "description": "Blade Forge - 拔刀剑参数化建模器（独立版）",
   "main": "src/main/main.js",
   "scripts": {
