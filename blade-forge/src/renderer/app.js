@@ -195,6 +195,7 @@ tex.anisotropy = 1;
 const meshes = {};
 const mats = {};
 let compatMode = false;
+let litMode = false;   // false = 基础材质（不依赖任何光照，最保险）
 
 /* 参数兜底：任何一项变成 NaN/Infinity 都会让整个几何失效、整把刀消失 */
 function sanitizeParams() {
@@ -209,18 +210,14 @@ function sanitizeParams() {
 function matFor(name, color) {
   if (mats[name]) return mats[name];
   let m;
-  if (compatMode && name !== 'effect') {
-    m = new THREE.MeshBasicMaterial({ color: 0xa9c4dd, side: THREE.DoubleSide });
-    mats[name] = m;
-    return m;
-  }
   if (name === 'effect') {
     m = new THREE.MeshBasicMaterial({ color: 0x62e6d6, transparent: true, opacity: 0.5, side: THREE.DoubleSide, depthWrite: false });
+  } else if (compatMode) {
+    m = new THREE.MeshBasicMaterial({ color: 0xa9c4dd, side: THREE.DoubleSide });
+  } else if (litMode) {
+    m = new THREE.MeshLambertMaterial({ map: tex, color: 0xffffff, emissive: 0x3a4757, side: THREE.DoubleSide });
   } else {
-    m = new THREE.MeshLambertMaterial({
-      map: tex, color: 0xffffff, emissive: 0x4a5d74,
-      side: THREE.DoubleSide,
-    });
+    m = new THREE.MeshBasicMaterial({ map: tex, color: 0xffffff, side: THREE.DoubleSide });
   }
   mats[name] = m;
   return m;
@@ -249,12 +246,9 @@ const exMats = {};
 function extraMat(color, glow) {
   const key = color + (glow ? 'g' : '');
   if (!exMats[key]) {
-    exMats[key] = new THREE.MeshStandardMaterial({
-      color: color, roughness: glow ? 0.3 : 0.55, metalness: glow ? 0.05 : 0.18,
-      emissive: color, emissiveIntensity: glow ? 1.2 : 0.22,
-      transparent: glow, opacity: glow ? 0.55 : 1, depthWrite: !glow, side: THREE.DoubleSide,
-      blending: glow ? THREE.AdditiveBlending : THREE.NormalBlending,
-    });
+    exMats[key] = glow
+      ? new THREE.MeshBasicMaterial({ color: color, transparent: true, opacity: 0.55, depthWrite: false, side: THREE.DoubleSide, blending: THREE.AdditiveBlending })
+      : new THREE.MeshLambertMaterial({ color: color, emissive: color, emissiveIntensity: 0.3, side: THREE.DoubleSide });
   }
   return exMats[key];
 }
@@ -286,7 +280,7 @@ function rebuild(opts) {
   for (const e of exList) {
     const mesh = new THREE.Mesh(e.geo, extraMat(e.color, e.target === 'effect'));
     mesh.name = 'extra:' + e.type;
-    mesh.castShadow = e.target !== 'effect';
+    mesh.castShadow = false;
     root.add(mesh);
     exMeshes.push(mesh);
   }
@@ -660,6 +654,18 @@ function autoFrame() {
   draw();
 }
 
+/* 视口平移：沿相机右向量/上向量移动观察中心（中键、右键、Shift+左键拖动） */
+function panBy(dx, dy, dz) {
+  const right = new THREE.Vector3();
+  const upv = new THREE.Vector3();
+  cam.matrixWorld.extractBasis(right, upv, new THREE.Vector3());
+  const k = camDist * 0.0016;
+  camTarget.addScaledVector(right, dx * k);
+  camTarget.addScaledVector(upv, dy * k);
+  if (dz) camTarget.y += dz * camDist * 0.06;
+  updateCamera(); draw();
+}
+
 function updateCamera() {
   const sp = Math.sin(camPhi), cp = Math.cos(camPhi);
   cam.position.set(
@@ -740,10 +746,19 @@ function ndcOf(ev) {
   );
 }
 
+canvas.addEventListener('contextmenu', (ev) => ev.preventDefault());
+
 canvas.addEventListener('pointerdown', function (ev) {
-  pickRay.setFromCamera(ndcOf(ev), cam);
-  const hit = pickRay.intersectObjects(handleGroup.children, false)[0];
   canvas.setPointerCapture(ev.pointerId);
+  const wantPan = ev.button === 1 || ev.button === 2 || (ev.button === 0 && ev.shiftKey);
+  if (wantPan) {
+    drag = { mode: 'pan', x: ev.clientX, y: ev.clientY };
+    canvas.style.cursor = 'grabbing';
+    return;
+  }
+  if (ev.button !== 0) { drag = null; return; }
+  pickRay.setFromCamera(ndcOf(ev), cam);
+  const hit = handleGroup.visible ? pickRay.intersectObjects(handleGroup.children, false)[0] : null;
   if (hit) {
     drag = { mode: 'handle', key: hit.object.userData.key, tip: hit.object.userData.tip };
     msg(drag.tip);
@@ -754,6 +769,12 @@ canvas.addEventListener('pointerdown', function (ev) {
 
 canvas.addEventListener('pointermove', function (ev) {
   if (!drag) return;
+  if (drag.mode === 'pan') {
+    const dx = ev.clientX - drag.x, dy = ev.clientY - drag.y;
+    drag.x = ev.clientX; drag.y = ev.clientY;
+    panBy(-dx, dy, 0);
+    return;
+  }
   if (drag.mode === 'view') {
     const dx = ev.clientX - drag.x, dy = ev.clientY - drag.y;
     drag.moved = Math.max(drag.moved, Math.abs(dx) + Math.abs(dy));
@@ -783,6 +804,8 @@ canvas.addEventListener('pointermove', function (ev) {
 });
 
 canvas.addEventListener('pointerup', function (ev) {
+  canvas.style.cursor = '';
+  if (drag && drag.mode === 'handle') { histPush(true); drag = null; return; }
   if (drag && drag.mode === 'view' && drag.moved < 4) {
     pickRay.setFromCamera(ndcOf(ev), cam);
     const hits = pickRay.intersectObjects(root.children, true).filter((h) => h.object && h.object.isMesh && h.object.visible);
@@ -1515,7 +1538,7 @@ let menuPop = null;
 const MENU_DEF = {
   file: [['新建', 'new'], ['打开工程', 'open'], ['保存工程', 'save'], ['导出 OBJ', 'obj'], ['导出贴图', 'tex'], ['导出资源包', 'pkg'], ['生成附属包', 'jar'], ['送去工坊', 'ses']],
   edit: [['撤销', 'undo'], ['重做', 'redo'], ['按当前参数重建几何', 'rebuild'], ['清空附加件', 'clearx']],
-  view: [['正视', 'front'], ['侧视', 'side'], ['俯视', 'top'], ['重置视角', 'reset'], ['全部显示组', 'showall'], ['重置参数', 'resetparams'], ['兼容模式（纯色）', 'compat'], ['原版基准', 'ref'], ['网格', 'grid'], ['线框', 'wire'], ['手柄', 'handles']],
+  view: [['正视', 'front'], ['侧视', 'side'], ['俯视', 'top'], ['重置视角', 'reset'], ['全部显示组', 'showall'], ['重置参数', 'resetparams'], ['基础材质（最保险）', 'basic'], ['立体光照材质', 'lit'], ['纯色诊断模式', 'compat'], ['原版基准', 'ref'], ['网格', 'grid'], ['线框', 'wire'], ['手柄', 'handles']],
   help: [['快捷键', 'keys'], ['反馈 / 提建议', 'fb'], ['GitHub 仓库', 'repo']],
 };
 function closeMenu() { if (menuPop) { menuPop.remove(); menuPop = null; } }
@@ -1568,11 +1591,16 @@ document.addEventListener('click', (ev) => {
     rebuild(); syncFields(); histPush(true); toast('参数已重置为默认');
     return;
   }
-  if (act === 'compat') {
-    compatMode = !compatMode;
+  if (act === 'basic' || act === 'lit' || act === 'compat') {
+    if (act === 'basic') { litMode = false; compatMode = false; }
+    if (act === 'lit') { litMode = true; compatMode = false; }
+    if (act === 'compat') compatMode = true;
     for (const k of Object.keys(mats)) { mats[k].dispose(); delete mats[k]; }
+    for (const k of Object.keys(exMats)) { exMats[k].dispose(); delete exMats[k]; }
     rebuild();
-    toast(compatMode ? '兼容模式：纯色材质（还是看不到就是显卡驱动问题）' : '已回到贴图材质');
+    toast(act === 'lit' ? '已切换立体光照材质（如果变黑，用「基础材质」）'
+      : act === 'compat' ? '纯色诊断模式：只显示形状，用于判断是不是材质问题'
+      : '基础材质：不受光照影响，最保险');
     return;
   }
   if (act === 'ref' || act === 'grid' || act === 'wire' || act === 'handles') return toggle(act);
@@ -1583,13 +1611,24 @@ document.addEventListener('click', (ev) => {
 
 // 快捷键
 window.addEventListener('keydown', (ev) => {
-  if (ev.target && ev.target.tagName === 'INPUT') return;
+  const tag = ev.target && ev.target.tagName;
+  if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || (ev.target && ev.target.isContentEditable)) return;
   const k = ev.key.toLowerCase();
   if ((ev.ctrlKey || ev.metaKey) && k === 'z') { ev.preventDefault(); histStep(ev.shiftKey ? 1 : -1); return; }
   if ((ev.ctrlKey || ev.metaKey) && k === 'y') { ev.preventDefault(); histStep(1); return; }
   const btn = { f: 'front', s: 'side', t: 'top' }[k];
   if (btn) {
     document.querySelector('.vbar [data-view="' + btn + '"]').click();
+    return;
+  }
+  const panKeys = {
+    arrowleft: [-1, 0, 0], a: [-1, 0, 0], arrowright: [1, 0, 0], d: [1, 0, 0],
+    arrowup: [0, 1, 0], q: [0, 1, 0], arrowdown: [0, -1, 0], e: [0, -1, 0],
+    pageup: [0, 0, 1], pagedown: [0, 0, -1],
+  };
+  if (panKeys[k]) {
+    ev.preventDefault();
+    panBy(panKeys[k][0] * 60, panKeys[k][1] * 60, panKeys[k][2]);
     return;
   }
   if (k === 'g') document.querySelector('[data-toggle="grid"]').click();
