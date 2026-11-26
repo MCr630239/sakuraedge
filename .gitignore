@@ -16,7 +16,6 @@ tools/
 Thumbs.db
 
 # 由 scripts/prepare.js 生成的构建产物
-blade-forge/src/renderer/vendor/
 blade-forge/src/renderer/bundle.js
 sakura-edge-studio/src/renderer/vendor/
 sakura-edge-studio/src/renderer/bundle.js
