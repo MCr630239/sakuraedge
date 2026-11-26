@@ -130,6 +130,18 @@ renderer.setClearColor(0x0b0d10, 1);
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
+/* GPU 信息：状态栏显示，软件渲染时自动关阴影，避免某些驱动上整片发黑 */
+let gpuTag = '';
+let softGL = false;
+try {
+  const gl = renderer.getContext();
+  const ext = gl.getExtension('WEBGL_debug_renderer_info');
+  const raw = String(ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : (gl.getParameter(gl.RENDERER) || ''));
+  gpuTag = raw.replace(/ANGLE\s*\(|Direct3D11|vs_5_0|ps_5_0|\)|,/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 42);
+  softGL = /swiftshader|llvmpipe|software|basic render|warp/i.test(raw);
+} catch (_) {}
+if (softGL) renderer.shadowMap.enabled = false;
+
 const scene = new THREE.Scene();
 const root = new THREE.Group();
 const refGroup = new THREE.Group();
@@ -140,6 +152,7 @@ let camTheta = -0.55, camPhi = 1.22, camDist = 690;
 const camTarget = new THREE.Vector3(88, 16, 0);
 
 scene.add(new THREE.HemisphereLight(0xe8f0ff, 0x171b24, 1.05));
+scene.add(new THREE.AmbientLight(0xffffff, 0.45));
 const key = new THREE.DirectionalLight(0xffffff, 1.35);
 key.position.set(300, 320, 260);
 key.castShadow = true;
@@ -170,8 +183,10 @@ const texCanvas = makeTextureCanvas();
 const defaultTexCanvas = makeTextureCanvas();
 const tex = new THREE.CanvasTexture(texCanvas);
 tex.colorSpace = THREE.SRGBColorSpace;
-tex.magFilter = THREE.NearestFilter;
-tex.minFilter = THREE.NearestFilter;
+tex.magFilter = THREE.LinearFilter;
+tex.minFilter = THREE.LinearFilter;
+tex.generateMipmaps = false;
+tex.anisotropy = 1;
 
 const meshes = {};
 const mats = {};
@@ -181,9 +196,8 @@ function matFor(name, color) {
   if (name === 'effect') {
     m = new THREE.MeshBasicMaterial({ color: 0x62e6d6, transparent: true, opacity: 0.5, side: THREE.DoubleSide, depthWrite: false });
   } else {
-    m = new THREE.MeshStandardMaterial({
-      map: tex, color: 0xffffff, roughness: 0.52, metalness: 0.18,
-      emissive: 0xffffff, emissiveMap: tex, emissiveIntensity: 0.14,
+    m = new THREE.MeshLambertMaterial({
+      map: tex, color: 0xffffff, emissive: 0x2f3f52,
       side: THREE.DoubleSide,
     });
   }
@@ -456,7 +470,7 @@ function renderInfo() {
     ['总长', Math.round(doc.params.len + doc.params.hlen) + ' / 377'],
     ['贴图', '128 × 256'],
   ].map((r) => '<div class="kv"><span>' + r[0] + '</span><b>' + r[1] + '</b></div>').join('');
-  $('stStats').textContent = v + ' 顶点 / ' + Math.round(t) + ' 面';
+  $('stStats').textContent = v + ' 顶点 / ' + Math.round(t) + ' 面' + (gpuTag ? ' · ' + gpuTag + (softGL ? '（软件渲染）' : '') : '');
 }
 
 function drawTex() {
@@ -471,8 +485,10 @@ let texLive = tex;
 function refreshTex() {
   const t = new THREE.CanvasTexture(texCanvas);
   t.colorSpace = THREE.SRGBColorSpace;
-  t.magFilter = THREE.NearestFilter;
-  t.minFilter = THREE.NearestFilter;
+  t.magFilter = THREE.LinearFilter;
+  t.minFilter = THREE.LinearFilter;
+  t.generateMipmaps = false;
+  t.anisotropy = 1;
   const old = texLive;
   texLive = t;
   for (const k of Object.keys(mats)) {
@@ -1103,6 +1119,7 @@ document.querySelector('.vbar').addEventListener('click', (ev) => {
     if (k === 'ref') { refGroup.visible = !refGroup.visible; t.classList.toggle('on', refGroup.visible); }
     if (k === 'grid') { grid.visible = !grid.visible; t.classList.toggle('on', grid.visible); }
     if (k === 'wire') { wire = !wire; applyWire(); t.classList.toggle('on', wire); }
+    if (k === 'handles') { handleGroup.visible = !handleGroup.visible; t.classList.toggle('on', handleGroup.visible); }
     draw();
   }
 });
