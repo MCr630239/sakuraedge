@@ -1,0 +1,7 @@
+{
+ "version": "0.18.8",
+ "url": "https://aka.doubaocdn.com/s/YkvoVtYTGh",
+ "size": 119970600,
+ "channel": "stable",
+ "notes": "更新下载改为 CDN 多线程（4 路分块），并显示速度；Blockbench 风格界面 + 自由方块"
+}

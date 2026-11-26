@@ -1861,6 +1861,11 @@ const UPD = {
   result: null,
   downloading: false,
   pct: 0,
+  got: 0,
+  total: 0,
+  speed: 0,
+  lastT: 0,
+  lastGot: 0,
   installing: false,
   installed: null,
 };
@@ -1907,7 +1912,11 @@ function updHtml() {
   if (UPD.checking) status = '<div class="note">正在读取更新源…</div>';
   else if (UPD.downloading) {
     const pct = Math.round((UPD.pct || 0) * 100);
-    status = '<div class="note">正在下载更新包… ' + pct + '%</div>'
+    const mb = (n) => (n / 1048576).toFixed(1);
+    let line = '正在下载更新包… ' + pct + '%';
+    if (UPD.total) line += ' · ' + mb(UPD.got) + ' / ' + mb(UPD.total) + ' MB';
+    if (UPD.speed) line += ' · ' + (UPD.speed / 1048576).toFixed(2) + ' MB/s';
+    status = '<div class="note">' + line + '</div>'
       + '<div style="height:6px;background:#15171b;border:1px solid #2a3340;border-radius:3px;overflow:hidden;margin:6px 0 10px">'
       + '<div style="height:6px;width:' + pct + '%;background:#3cd0c4"></div></div>';
   } else if (UPD.installing) status = '<div class="note">正在解压更新包…</div>';
@@ -1966,6 +1975,17 @@ async function initUpd(silent) {
     if (window.api.onUpdateProgress) {
       window.api.onUpdateProgress((p) => {
         if (!p || p.phase !== 'download') return;
+        const now = Date.now();
+        if (UPD.lastT && now - UPD.lastT > 250) {
+          UPD.speed = (p.got - UPD.lastGot) / ((now - UPD.lastT) / 1000);
+          UPD.lastT = now;
+          UPD.lastGot = p.got;
+        } else if (!UPD.lastT) {
+          UPD.lastT = now;
+          UPD.lastGot = p.got;
+        }
+        UPD.got = p.got;
+        UPD.total = p.total;
         UPD.pct = p.pct || 0;
         if (UPD.downloading && !$('updModal').hidden) renderUpd();
       });
@@ -2006,7 +2026,7 @@ async function runUpdDownload(install) {
   const meta = UPD.result && UPD.result.ok ? UPD.result.meta : null;
   if (!meta || !meta.url) { toast('更新清单里没有下载地址'); return; }
   UPD.downloading = true;
-  UPD.pct = 0;
+  UPD.pct = 0; UPD.got = 0; UPD.total = 0; UPD.speed = 0; UPD.lastT = 0; UPD.lastGot = 0;
   renderUpd();
   const dl = await window.api.updateDownload({ url: meta.url, assetApi: meta.assetApi || '' });
   UPD.downloading = false;

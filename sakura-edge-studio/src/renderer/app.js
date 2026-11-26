@@ -1157,7 +1157,11 @@ function updateTab() {
   if (u.checking) status = '<p class="hint">正在读取更新源…</p>';
   else if (u.downloading) {
     const pct = Math.round((u.pct || 0) * 100);
-    status = `<p class="hint">正在下载更新包… ${pct}%</p>
+    const mb = (n) => (n / 1048576).toFixed(1);
+    let line = `正在下载更新包… ${pct}%`;
+    if (u.total) line += ` · ${mb(u.got)} / ${mb(u.total)} MB`;
+    if (u.speed) line += ` · ${(u.speed / 1048576).toFixed(2)} MB/s`;
+    status = `<p class="hint">${line}</p>
       <div style="height:6px;background:#1a2330;border-radius:3px;overflow:hidden;margin:6px 0 10px"><div style="height:6px;width:${pct}%;background:#e05a7a"></div></div>`;
   } else if (u.installing) status = `<p class="hint">正在解压更新包…</p>`;
   else if (u.installed) {
@@ -1325,6 +1329,17 @@ async function initUpdate() {
     if (window.api.onUpdateProgress) {
       window.api.onUpdateProgress((p) => {
         if (!p || p.phase !== 'download') return;
+        const now = Date.now();
+        if (state.upd.lastT && now - state.upd.lastT > 250) {
+          state.upd.speed = (p.got - state.upd.lastGot) / ((now - state.upd.lastT) / 1000);
+          state.upd.lastT = now;
+          state.upd.lastGot = p.got;
+        } else if (!state.upd.lastT) {
+          state.upd.lastT = now;
+          state.upd.lastGot = p.got;
+        }
+        state.upd.got = p.got;
+        state.upd.total = p.total;
         state.upd.pct = p.pct || 0;
         if (state.tab === 'update' && state.upd.downloading) renderInspector();
       });

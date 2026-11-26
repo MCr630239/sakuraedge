@@ -1,0 +1,7 @@
+{
+ "version": "1.14.10",
+ "url": "https://aka.doubaocdn.com/s/W7FfcrCb2B",
+ "size": 116877745,
+ "channel": "stable",
+ "notes": "更新下载改为 CDN 多线程，显示速度"
+}

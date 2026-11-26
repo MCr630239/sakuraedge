@@ -422,7 +422,9 @@ ipcMain.handle('shell:openUrl', (_e, url) => {
 
 /* ---------- 自动更新 ---------- */
 /* 官方更新源：本项目的公开仓库，客户端默认就填这个 */
-const DEFAULT_UPDATE_SOURCE = 'github:MCr630239/sakuraedge';
+const DEFAULT_UPDATE_SOURCE = 'https://raw.githubusercontent.com/MCr630239/sakuraedge/main/latest-studio.json';
+const LEGACY_UPDATE_SOURCE = 'github:MCr630239/sakuraedge';
+const GITHUB_UPDATE_SOURCE = 'github:MCr630239/sakuraedge';
 const os = require('os');
 const http = require('http');
 const https = require('https');
@@ -540,6 +542,97 @@ function downloadTo(url, dest, onProgress, depth = 0, headers = null) {
   });
 }
 
+/* 分块并发下载：CDN 支持 Range 时 4 路一起下，比单线程快数倍 */
+function probeTotal(url) {
+  return new Promise((resolve, reject) => {
+    const go = (u, d) => {
+      if (d > 4) return reject(new Error('重定向太多'));
+      const lib = /^https:/i.test(u) ? https : http;
+      const req = lib.get(u, { timeout: 20000, headers: { Range: 'bytes=0-0' } }, (res) => {
+        if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
+          res.resume();
+          return go(new URL(res.headers.location, u).toString(), d + 1);
+        }
+        const cr = String(res.headers['content-range'] || '');
+        const m = cr.match(/bytes\s+\d+-\d+\/(\d+)/i);
+        res.resume();
+        if (res.statusCode === 206 && m) return resolve(Number(m[1]));
+        reject(new Error('服务端不支持分块'));
+      });
+      req.on('timeout', () => req.destroy(new Error('探测超时')));
+      req.on('error', reject);
+    };
+    go(url, 0);
+  });
+}
+
+function fetchRange(url, start, end, dest, onBytes, depth = 0) {
+  return new Promise((resolve, reject) => {
+    if (depth > 4) return reject(new Error('重定向太多'));
+    const lib = /^https:/i.test(url) ? https : http;
+    const req = lib.get(url, { timeout: 30000, headers: { Range: 'bytes=' + start + '-' + end } }, (res) => {
+      if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
+        res.resume();
+        return fetchRange(new URL(res.headers.location, url).toString(), start, end, dest, onBytes, depth + 1).then(resolve, reject);
+      }
+      if (res.statusCode !== 206 && res.statusCode !== 200) {
+        res.resume();
+        return reject(new Error('分块返回 ' + res.statusCode));
+      }
+      const out = fs.createWriteStream(dest);
+      res.on('data', (c) => onBytes(c.length));
+      res.on('error', reject);
+      out.on('error', reject);
+      out.on('finish', resolve);
+      res.pipe(out);
+    });
+    req.on('timeout', () => req.destroy(new Error('分块超时')));
+    req.on('error', reject);
+  });
+}
+
+async function downloadFast(url, dest, onProgress, threads = 4) {
+  let total = 0;
+  try { total = await probeTotal(url); } catch (_) { return downloadTo(url, dest, onProgress); }
+  if (!total || total < 4 * 1024 * 1024) return downloadTo(url, dest, onProgress);
+  const chunk = Math.ceil(total / threads);
+  const parts = [];
+  let got = 0;
+  const tick = (n) => { got += n; if (onProgress) onProgress(got, total); };
+  const jobs = [];
+  for (let i = 0; i < threads; i++) {
+    const start = i * chunk;
+    if (start >= total) break;
+    const end = Math.min(total - 1, start + chunk - 1);
+    const part = path.join(updDir(), 'part' + i + '.bin');
+    parts.push(part);
+    jobs.push(fetchRange(url, start, end, part, tick));
+  }
+  try {
+    await Promise.all(jobs);
+  } catch (e) {
+    for (const p of parts) { try { fs.rmSync(p, { force: true }); } catch (_) {} }
+    return downloadTo(url, dest, onProgress);
+  }
+  await new Promise((resolve, reject) => {
+    const out = fs.createWriteStream(dest);
+    let i = 0;
+    const next = () => {
+      if (i >= parts.length) { out.end(); return; }
+      const idx = i;
+      const rs = fs.createReadStream(parts[idx]);
+      i += 1;
+      rs.pipe(out, { end: false });
+      rs.on('end', () => { try { fs.rmSync(parts[idx], { force: true }); } catch (_) {} next(); });
+      rs.on('error', reject);
+    };
+    out.on('finish', resolve);
+    out.on('error', reject);
+    next();
+  });
+  return total;
+}
+
 /* GitHub Releases 源：github:owner/repo[@tag]、github.com/owner/repo、api.github.com/repos/... */
 function parseGithubSource(src) {
   if (!src) return null;
@@ -652,7 +745,7 @@ ipcMain.handle('update:state', () => {
     version: app.getVersion(),
     platform: process.platform,
     packaged: app.isPackaged,
-    source: cfg.source || DEFAULT_UPDATE_SOURCE,
+    source: (!cfg.source || cfg.source === LEGACY_UPDATE_SOURCE) ? DEFAULT_UPDATE_SOURCE : cfg.source,
     autoCheck: cfg.autoCheck !== false,
     lastCheck: cfg.lastCheck || 0,
   };
@@ -663,9 +756,51 @@ ipcMain.handle('update:save', (_e, patch) => {
   return { ok: true, source: next.source || '', autoCheck: next.autoCheck !== false };
 });
 
+async function checkByList(src, cfg) {
+  const text = await readListSource(src);
+  const meta = JSON.parse(text);
+  if (!meta.version) throw new Error('更新清单缺少 version 字段');
+  let dl = meta.url || '';
+  if (dl && !/^https?:|^file:/i.test(dl)) dl = new URL(dl, src).toString();
+  return {
+    ok: true,
+    current: app.getVersion(),
+    newer: cmpVer(meta.version, app.getVersion()) > 0,
+    meta: {
+      version: String(meta.version),
+      url: dl,
+      size: Number(meta.size || 0),
+      notes: String(meta.notes || ''),
+      sha256: String(meta.sha256 || ''),
+      channel: String(meta.channel || 'stable'),
+    },
+  };
+}
+
 ipcMain.handle('update:check', async (_e, source) => {
   const cfg = readUpdCfg();
-  const src = String(source || cfg.source || '').trim();
+  const raw = String(source || cfg.source || '').trim();
+  const auto = !raw || raw === LEGACY_UPDATE_SOURCE || raw === DEFAULT_UPDATE_SOURCE || raw === GITHUB_UPDATE_SOURCE;
+  if (auto) {
+    try {
+      const r = await checkByList(DEFAULT_UPDATE_SOURCE, cfg);
+      if (r.newer) { writeUpdCfg({ source: DEFAULT_UPDATE_SOURCE, lastCheck: Date.now() }); return r; }
+      const g = await checkGithub(parseGithubSource(GITHUB_UPDATE_SOURCE), cfg.token || process.env.GITHUB_TOKEN || '');
+      if (g.ok && g.newer) { writeUpdCfg({ lastCheck: Date.now() }); return g; }
+      writeUpdCfg({ source: DEFAULT_UPDATE_SOURCE, lastCheck: Date.now() });
+      return r;
+    } catch (e) {
+      try {
+        const g = await checkGithub(parseGithubSource(GITHUB_UPDATE_SOURCE), cfg.token || process.env.GITHUB_TOKEN || '');
+        writeUpdCfg({ lastCheck: Date.now() });
+        return g;
+      } catch (e2) {
+        writeUpdCfg({ lastCheck: Date.now() });
+        return { ok: false, error: String((e && e.message) || e) };
+      }
+    }
+  }
+  const src = raw;
   const gh = parseGithubSource(src);
   if (gh) {
     try {
@@ -730,11 +865,12 @@ ipcMain.handle('update:download', async (e, arg) => {
     }
     fs.mkdirSync(updDir(), { recursive: true });
     const dest = path.join(updDir(), 'SakuraEdgeStudio-update.zip');
-    const bytes = await downloadTo(url, dest, (got, total) => {
+    const onProg = (got, total) => {
       try {
         e.sender.send('update:progress', { phase: 'download', got, total, pct: total ? got / total : 0 });
       } catch (_) {}
-    }, 0, headers);
+    };
+    const bytes = headers ? await downloadTo(url, dest, onProg) : await downloadFast(url, dest, onProg);
     return { ok: true, path: dest, bytes };
   } catch (err) {
     return { ok: false, error: String((err && err.message) || err) };
