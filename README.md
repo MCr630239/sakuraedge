@@ -61,6 +61,17 @@ tag: v1.14.3
       BladeForge-0.18.1-Windows-x64.zip        （建模器）
 ```
 
+一键发版（需要 `gh` 已登录，zip 放在仓库上一级目录）：
+
+```bash
+scripts/release.sh 1.14.3 0.18.1
+# 或指定 zip 目录
+scripts/release.sh 1.14.3 0.18.1 /home/user/Doubao/chats/38456044449975554
+```
+
+脚本会按工坊版本打 `v<版本>` tag、写好说明并上传两个 zip；tag 已存在则改为覆盖附件。
+公开仓库的更新源直接填 `github:MCr630239/sakuraedge` 即可。
+
 私有仓库也能用：在更新页填一个 fine-grained token（权限只勾 `Contents: Read`）即可，检查与下载都会带鉴权。GitHub API 被限流时会自动改读 `releases.atom`，按上面的附件命名约定拼下载地址。
 
 更新流程：下载 zip → 解压到临时目录 → 校验包内有对应 exe → 生成替换脚本 → 程序退出 → `robocopy` 覆盖安装目录 → 自动重启。替换日志写在系统临时目录的 `blade-forge-update` / `sakura-edge-update` 里，失败会留标记，下次启动时提示。
