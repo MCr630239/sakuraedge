@@ -1,14 +1,14 @@
 {
  "version": "0.20.5",
- "url": "https://aka.doubaocdn.com/s/cdKtrME5kr",
- "size": 105061563,
+ "url": "https://aka.doubaocdn.com/s/p5llRuSlTG",
+ "size": 105226348,
  "channel": "stable",
- "notes": "修复 0.20.4 菜单栏被隐藏的问题，原生菜单（文件/编辑/视图/工具/帮助）现在常显。",
+ "notes": "菜单栏常显修复；locales 补回 en-US 兜底（消除启动告警），仍只占 1MB。",
  "deltas": [
   {
    "from": "0.20.4",
-   "url": "https://aka.doubaocdn.com/s/TVAvtq7Iuy",
-   "size": 1134479
+   "url": "https://aka.doubaocdn.com/s/vvD9xL2rcn",
+   "size": 1299450
   }
  ]
 }
