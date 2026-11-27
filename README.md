@@ -6,8 +6,8 @@
 
 | 工具 | 干什么 | 形态 |
 | --- | --- | --- |
-| **Blade Forge**（拔刀剑建模器，0.18.1） | 参数化拼刀：刀身/镡/柄/鞘/血槽/缠绳…，直接改滑杆和黄色手柄，8 组标准 OBJ 分组自动对齐，内置原版基准模型可对照 | Electron 桌面程序 |
-| **Sakura Edge Studio**（樱刃工坊，1.14.3） | 刀数据中枢：属性 / 渲染 / 配方（含自定义 3×3 与锻造台）/ 346 附魔 / 奥义 / 工程体检 / 一键导出附属包 jar、资源包、数据包、刀谱 | Electron 桌面程序 |
+| **Blade Forge**（拔刀剑建模器，0.19.8） | 参数化拼刀：刀身/镡/柄/鞘/血槽/缠绳…，直接改滑杆和黄色手柄，8 组标准 OBJ 分组自动对齐；编辑菜单可「添加元素」（方块 / 圆柱 / 球 / 四棱锥 / 三棱柱 / 圆锥 / 圆环，位置·尺寸·三轴旋转·贴图可调），视口默认浅色背景（深色刀贴图也能看清），内置原版基准模型可对照 | Electron 桌面程序 |
+| **Sakura Edge Studio**（樱刃工坊，1.14.19） | 刀数据中枢：属性 / 渲染 / 配方（含自定义 3×3 与锻造台）/ 346 附魔 / 奥义 / 工程体检 / 一键导出附属包 jar、资源包、数据包、刀谱 | Electron 桌面程序 |
 | **BladeForgeArts**（前置模组，1.5.0） | 数据侧补内容：14 个自定义附魔 + `/bladeforge` 命令，供工坊产出的包直接引用 | Forge 模组（Java） |
 
 三者分工明确：建模器只负责「形」，工坊负责「数 + 奥义 + 附魔 + 出包」，前置模组补游戏内没有的附魔与命令。
@@ -49,24 +49,24 @@ cd blade-arts
 
 两个桌面工具都内置更新，支持三种源：
 
-- `github:用户名/仓库`：读最新 release，也可写 `github:用户名/仓库@v1.14.2` 固定版本
+- `github:用户名/仓库`：读最新 release，也可写 `github:用户名/仓库@v1.14.19` 固定版本
 - `latest.json` 的 http 地址
 - 本地文件 / 目录（目录下放 `latest.json`）
 
 发版约定（GitHub Releases）：
 
 ```text
-tag: v1.14.3
-附件: SakuraEdgeStudio-1.14.3-Windows-x64.zip  （工坊）
-      BladeForge-0.18.1-Windows-x64.zip        （建模器）
+tag: v1.14.19
+附件: SakuraEdgeStudio-1.14.19-Windows-x64.zip  （工坊）
+      BladeForge-0.19.8-Windows-x64.zip         （建模器）
 ```
 
 一键发版（需要 `gh` 已登录，zip 放在仓库上一级目录）：
 
 ```bash
-scripts/release.sh 1.14.3 0.18.1
+scripts/release.sh 1.14.19 0.19.8
 # 或指定 zip 目录
-scripts/release.sh 1.14.3 0.18.1 /home/user/Doubao/chats/38456044449975554
+scripts/release.sh 1.14.19 0.19.8 /home/user/Doubao/chats/38456044449975554
 ```
 
 脚本会按工坊版本打 `v<版本>` tag、写好说明并上传两个 zip；tag 已存在则改为覆盖附件。
