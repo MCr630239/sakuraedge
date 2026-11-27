@@ -1,7 +1,7 @@
 {
  "version": "0.20.3",
- "url": "https://aka.doubaocdn.com/s/XK6SAqEW7B",
- "size": 105569988,
+ "url": "https://aka.doubaocdn.com/s/1UG35noBoX",
+ "size": 105061086,
  "channel": "stable",
  "notes": "修复内置原版刀载入后名称停留在「无名刀」，现在自动填充刀名；自动更新安装脚本加超时，避免黑窗卡死。",
  "deltas": [
