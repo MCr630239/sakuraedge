@@ -1,10 +1,10 @@
 {
- "version": "0.19.14",
- "url": "https://aka.doubaocdn.com/s/Oiqm3mMvhe",
- "size": 108911822,
+ "version": "0.19.15",
+ "url": "https://aka.doubaocdn.com/s/VqUOW1hLTG",
+ "size": 108918160,
  "channel": "stable",
- "notes": "更新检查支持 CDN：清单本身也放项目 CDN（内嵌地址，优先请求，国内直连秒回），CDN 取不到再退 gh-proxy / raw / jsDelivr / fastly；多个源都会比一遍，取版本最高的那份，避免 CDN 清单落后一版时漏掉刚发的新版。更新包与增量包本来就全走 CDN 多线程下载。",
+ "notes": "导入 OBJ 增强：挂件现在解析 vt 保留原 UV，贴图区可选刀身 / 柄 / 镡 / 鞘 / 原 UV / 纯色，另加三轴旋转、分组扩到 blade / sheath / effect；新增「整刀 OBJ」——读 OBJ 的 g 分组，按组名替换刀身 / 刀鞘 / SA 发光 / 损坏刀 / 断片 / 三个物品栏图标，可整体缩放，点 × 即可恢复参数生成的刀。",
  "deltas": [
-  { "from": "0.19.13", "url": "https://aka.doubaocdn.com/s/xwhliCuZnN", "size": 4479931 }
+  { "from": "0.19.14", "url": "https://aka.doubaocdn.com/s/1IT2XHVgD2", "size": 4486359 }
  ]
 }
