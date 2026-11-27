@@ -1,10 +1,14 @@
 {
- "version": "0.19.15",
- "url": "https://aka.doubaocdn.com/s/VqUOW1hLTG",
- "size": 108918160,
+ "version": "0.19.16",
+ "url": "https://aka.doubaocdn.com/s/htUzJ9loJD",
+ "size": 108919057,
  "channel": "stable",
- "notes": "导入 OBJ 增强：挂件现在解析 vt 保留原 UV，贴图区可选刀身 / 柄 / 镡 / 鞘 / 原 UV / 纯色，另加三轴旋转、分组扩到 blade / sheath / effect；新增「整刀 OBJ」——读 OBJ 的 g 分组，按组名替换刀身 / 刀鞘 / SA 发光 / 损坏刀 / 断片 / 三个物品栏图标，可整体缩放，点 × 即可恢复参数生成的刀。",
+ "notes": "工程可以带走 OBJ 了：整刀导入和「导入元素」挂件的 OBJ 原文会内嵌进 .bfj 工程文件（单个文件 4MB 以内），换机器、原路径丢失也能照常打开；超限的大模型仍按路径读取并提示缺失。",
  "deltas": [
-  { "from": "0.19.14", "url": "https://aka.doubaocdn.com/s/1IT2XHVgD2", "size": 4486359 }
+  {
+   "from": "0.19.15",
+   "url": "https://aka.doubaocdn.com/s/cUH8LYN7e6",
+   "size": 4487232
+  }
  ]
 }
