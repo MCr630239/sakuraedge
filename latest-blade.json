@@ -1,14 +1,14 @@
 {
- "version": "0.20.0",
- "url": "https://aka.doubaocdn.com/s/Io3Rlcezvn",
- "size": 105564577,
+ "version": "0.20.1",
+ "url": "https://aka.doubaocdn.com/s/9oZGsEQVw9",
+ "size": 105565664,
  "channel": "stable",
- "notes": "大版本：内置 6 把拔刀剑原版刀模型作参考并标注刀名（無銘 / 「千鹤」村正 / 散华 / 夜叉 / 伪物「鄂门」 / 魔剑「阎魔刀」）；贴图绘制升级（撤销重做、吸管取色、油漆桶、左右镜像、16px 网格、1~3 倍放大）；新增「更新日志」面板。",
+ "notes": "修复：贴图 1×/2×/3× 放大真正生效；调色板可自定义（色板「＋」加色、右键删色、自动记住）；贴图撤销/重做加 Alt+Z / Alt+Shift+Z 快捷键。",
  "deltas": [
   {
-   "from": "0.19.18",
-   "url": "https://aka.doubaocdn.com/s/OXchC7qgVk",
-   "size": 1128591
+   "from": "0.20.0",
+   "url": "https://aka.doubaocdn.com/s/GCdkhy37WE",
+   "size": 1129679
   }
  ]
 }
