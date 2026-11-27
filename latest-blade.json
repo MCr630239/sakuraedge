@@ -1,9 +1,9 @@
 {
- "version": "0.20.10",
- "url": "https://aka.doubaocdn.com/s/A7pgcIznRa",
- "size": 105234573,
+ "version": "0.20.11",
+ "url": "https://aka.doubaocdn.com/s/c8nWMzOIxA",
+ "size": 105234742,
  "channel": "stable",
- "notes": "修贴图错位：丢掉整刀转参数化时同步恢复默认分区贴图；整刀模式点「重置贴图」改为恢复该刀的原版贴图。",
+ "notes": "修「载入内置原版刀」弹层排版：副名不再被裁掉、取消按钮不再盖住最后一行。",
  "deltas": [
   {
    "from": "0.19.18",
@@ -59,6 +59,11 @@
    "from": "0.20.9",
    "url": "https://aka.doubaocdn.com/s/MNFdxNFhl1",
    "size": 1140674
+  },
+  {
+   "from": "0.20.10",
+   "url": "https://aka.doubaocdn.com/s/EM2joa6Y07",
+   "size": 1140842
   }
  ]
 }
