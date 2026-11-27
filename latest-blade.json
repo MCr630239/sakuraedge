@@ -1,14 +1,14 @@
 {
- "version": "0.20.6",
- "url": "https://aka.doubaocdn.com/s/sVKyXZpaBo",
- "size": 105228860,
+ "version": "0.20.7",
+ "url": "https://aka.doubaocdn.com/s/zsu3GT2YSH",
+ "size": 105228718,
  "channel": "stable",
- "notes": "修复内置原版刀被青色光效壳/物品图标平面糊住：effect、item_blade 等组默认隐藏，刀身露出原版贴图，大纲里可手动打开。",
+ "notes": "更新安装器换成隐藏窗口的 PowerShell（wscript 启动），不再出现 cmd 黑窗、不再卡在等待进程；等待旧进程最多 60 秒后直接覆盖。",
  "deltas": [
   {
-   "from": "0.20.5",
-   "url": "https://aka.doubaocdn.com/s/GxYTM6PwtK",
-   "size": 1134961
+   "from": "0.20.6",
+   "url": "https://aka.doubaocdn.com/s/OonDbQY3qO",
+   "size": 1134819
   }
  ]
 }
