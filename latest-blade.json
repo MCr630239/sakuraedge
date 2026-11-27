@@ -1,14 +1,14 @@
 {
- "version": "0.19.18",
- "url": "https://aka.doubaocdn.com/s/te4TK2Y9o3",
- "size": 108920124,
+ "version": "0.20.0",
+ "url": "https://aka.doubaocdn.com/s/Io3Rlcezvn",
+ "size": 105564577,
  "channel": "stable",
- "notes": "真·自动更新：启动自动检查，发现新版自动下载、自动重启安装，只在状态栏提示；有未保存改动时先只下载，等你保存后再装。更新面板新增「发现新版自动下载安装」开关（默认开）。",
+ "notes": "大版本：内置 6 把拔刀剑原版刀模型作参考并标注刀名（無銘 / 「千鹤」村正 / 散华 / 夜叉 / 伪物「鄂门」 / 魔剑「阎魔刀」）；贴图绘制升级（撤销重做、吸管取色、油漆桶、左右镜像、16px 网格、1~3 倍放大）；新增「更新日志」面板。",
  "deltas": [
   {
-   "from": "0.19.17",
-   "url": "https://aka.doubaocdn.com/s/sD3gICA1cv",
-   "size": 4485325
+   "from": "0.19.18",
+   "url": "https://aka.doubaocdn.com/s/OXchC7qgVk",
+   "size": 1128591
   }
  ]
 }

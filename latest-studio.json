@@ -1,14 +1,14 @@
 {
- "version": "1.14.21",
- "url": "https://aka.doubaocdn.com/s/8qY4GZPOus",
- "size": 105800789,
+ "version": "1.15.0",
+ "url": "https://aka.doubaocdn.com/s/yh6fFxRiOn",
+ "size": 106081968,
  "channel": "stable",
- "notes": "真·自动更新：启动自动检查，发现新版自动下载、自动重启安装；有未保存改动时先只下载，保存后再装。更新面板新增「发现新版自动下载安装」开关（默认开）。",
+ "notes": "大版本：内置模型扩到 7 把并标注是哪把刀（樱刃 katana / 無銘 / 「千鹤」村正 / 散华 / 夜叉 / 伪物「鄂门」 / 魔剑「阎魔刀」），模型卡片写明当前模型；新增「更新日志」按钮。",
  "deltas": [
   {
-   "from": "1.14.20",
-   "url": "https://aka.doubaocdn.com/s/RhKVET65vR",
-   "size": 1360804
+   "from": "1.14.21",
+   "url": "https://aka.doubaocdn.com/s/nihY8MraHP",
+   "size": 1640508
   }
  ]
 }
