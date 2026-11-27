@@ -1,10 +1,10 @@
 {
- "version": "0.19.12",
- "url": "https://aka.doubaocdn.com/s/SRhfG2KHb3",
- "size": 108911036,
+ "version": "0.19.13",
+ "url": "https://aka.doubaocdn.com/s/Otxu2SVpV6",
+ "size": 108911271,
  "channel": "stable",
- "notes": "「居中」/Home 现在连相机朝向一起复位：以前只改距离和目标点，若先把视角转到刀底/刀后，居中后仍然看不见东西。另外正视图/侧视图/俯视图的目标点改为模型包围盒中心（刀长大改也不会偏出去）。\n上一版：贴图面板「笔粗」滑杆恢复整行宽度。",
+ "notes": "大纲列表修显示：窗口矮（1080p + 系统缩放）时面板被压缩，最后几行 item_bladens / item_damaged 被「全部显示」按钮压掉半截；现在大纲按内容撑开，8 组完整可见，并在每组名后直接标出中文含义（刀+镡+柄 / 刀鞘 / SA 发光 / 损坏的刀 / 断片 / 物品栏图标 / 图标（损坏）/ 图标 NS）。",
  "deltas": [
-  { "from": "0.19.11", "url": "https://aka.doubaocdn.com/s/3xyYBhP7Ya", "size": 4479172 }
+  { "from": "0.19.12", "url": "https://aka.doubaocdn.com/s/VOS9O3IScW", "size": 4479365 }
  ]
 }
