@@ -1,7 +1,7 @@
 {
   "name": "sakura-edge-studio",
   "productName": "SakuraEdgeStudio",
-  "version": "1.14.17",
+  "version": "1.14.18",
   "description": "拔刀剑自定义工坊 —— 可视化编辑并一键导出 SlashBlade: Resharped 1.20.1 附属包",
   "main": "src/main/main.js",
   "author": "Doubao",
@@ -9,7 +9,7 @@
   "scripts": {
     "prepare-assets": "node scripts/prepare.js",
     "start": "node scripts/prepare.js && electron .",
-    "pack:win": "node scripts/prepare.js && electron-packager . SakuraEdgeStudio --platform=win32 --arch=x64 --out=dist --overwrite --icon=assets/icon.ico --prune=true --ignore=\"^(/dist|/tools|/.git)\"",
+    "pack:win": "node scripts/prepare.js && electron-packager . SakuraEdgeStudio --platform=win32 --arch=x64 --out=dist --overwrite --icon=assets/icon.ico --prune=true --ignore=\"^(/dist|/tools|/src/renderer/vendor|/.git)\" && node scripts/slim.js dist/SakuraEdgeStudio-win32-x64",
     "pack:linux": "node scripts/prepare.js && electron-packager . SakuraEdgeStudio --platform=linux --arch=x64 --out=dist --overwrite --prune=true"
   },
   "dependencies": {

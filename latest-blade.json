@@ -1,12 +1,10 @@
 {
- "version": "0.19.5",
- "url": "https://aka.doubaocdn.com/s/WWVC4VjXKt",
- "size": 119975395,
+ "version": "0.19.6",
+ "url": "https://aka.doubaocdn.com/s/ho38Sqs5Rs",
+ "size": 109255082,
  "channel": "stable",
- "notes": "增量更新：从 0.19.2/0.19.3/0.19.4 升级只需下 4.7MB（整包 114.4MB）；解压按内容 CRC 判断，大小相同但内容变了一定会覆盖；增量包失败自动退回整包",
+ "notes": "瘦身 15MB：只保留 zh-CN/zh-TW/en-US/en-GB 四个语言包（删掉 51 个，省 38.4MB 磁盘），asar 里去掉与 bundle 重复的 three.js 源码；老版本升级时会自动清掉遗留的多余语言包",
  "deltas": [
-  { "from": "0.19.4", "url": "https://aka.doubaocdn.com/s/fWMundscoV", "size": 4886370 },
-  { "from": "0.19.3", "url": "https://aka.doubaocdn.com/s/ORK6u759uM", "size": 4886370 },
-  { "from": "0.19.2", "url": "https://aka.doubaocdn.com/s/z0QIOQDtJX", "size": 4886370 }
+  { "from": "0.19.5", "url": "https://aka.doubaocdn.com/s/Xs2fJxTKPW", "size": 4462859 }
  ]
 }

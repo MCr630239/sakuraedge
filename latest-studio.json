@@ -1,10 +1,10 @@
 {
- "version": "1.14.17",
- "url": "https://aka.doubaocdn.com/s/EkNScYFTyU",
- "size": 116880271,
+ "version": "1.14.18",
+ "url": "https://aka.doubaocdn.com/s/AKxoevM6Vi",
+ "size": 106159552,
  "channel": "stable",
- "notes": "与 Blade Forge 0.19.5 配套；从 1.14.16 升级只需 1.7MB",
+ "notes": "与 Blade Forge 0.19.6 配套；同样瘦身（只留四个语言包），增量升级 1.3MB",
  "deltas": [
-  { "from": "1.14.16", "url": "https://aka.doubaocdn.com/s/Q3bUrJmtNs", "size": 1778323 }
+  { "from": "1.14.17", "url": "https://aka.doubaocdn.com/s/iwzsI8IZYJ", "size": 1355091 }
  ]
 }

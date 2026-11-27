@@ -160,6 +160,7 @@ function createWindow() {
   });
 }
 
+app.whenReady().then(() => { try { applyPendingPrune(); } catch (e) {} });
 app.whenReady().then(createWindow);
 app.on('window-all-closed', () => app.quit());
 
@@ -924,6 +925,26 @@ function crc32File(p) {
   });
 }
 
+// 上次更新留下的"该删的旧文件"清单：启动时清一遍（bat 里删不掉的兜底）
+function applyPendingPrune() {
+  const f = path.join(updDir(), 'to-prune.json');
+  if (!fs.existsSync(f)) return;
+  try {
+    const list = JSON.parse(fs.readFileSync(f, 'utf8'));
+    const base = path.dirname(app.getPath('exe'));
+    let n = 0;
+    for (const rel of (Array.isArray(list) ? list : [])) {
+      try {
+        if (rel && !/^\.\./.test(rel)) { fs.rmSync(path.join(base, rel), { force: true }); n++; }
+      } catch (e) {}
+    }
+    fs.rmSync(f, { force: true });
+    console.log('[prune] 清掉旧文件 ' + n + ' 个');
+  } catch (e) {
+    try { fs.rmSync(f, { force: true }); } catch (_) {}
+  }
+}
+
 // 解压 zip 到临时目录，返回可覆盖的文件根目录
 async function stageZip(zipPath, appDir, onProg) {
   // Electron 的 fs 代理会把任何 *.asar 当成包去解析，写 app.asar 时要用纯 fs
@@ -954,12 +975,17 @@ async function stageZipInner(zipPath, appDir, onProg) {
   // 增量解压：磁盘上已有的同尺寸文件直接跳过，只解真正变了的那几个（asar 等）
   const canDiff = !!appDir && fs.existsSync(appDir);
   let count = 0, skipped = 0, done = 0;
+  let prune = null;
   for (const name of entries) {
     const entry = zip.files[name];
     const rel = rootPrefix && name.startsWith(rootPrefix) ? name.slice(rootPrefix.length) : name;
     if (!rel) continue;
     done++;
     if (onProg) onProg(done, entries.length, skipped);
+    if (rel === '_prune.txt' && !entry.dir) {
+      prune = String((await entry.async('nodebuffer')).toString('utf8')).split('\n').map((x) => x.trim()).filter(Boolean);
+      // 照常解压到 stage，替换脚本要靠这个文件逐个删旧文件
+    }
     if (entry.dir) { fs.mkdirSync(path.join(stage, rel), { recursive: true }); continue; }
     const usz = entry._data && entry._data.uncompressedSize != null ? entry._data.uncompressedSize : -1;
     const crc = entry._data && entry._data.crc32 != null ? entry._data.crc32 : -1;
@@ -982,11 +1008,11 @@ async function stageZipInner(zipPath, appDir, onProg) {
   const exe = path.join(stage, 'BladeForge.exe');
   // 主程序同版本时会被跳过，此时沿用安装目录里已有的 exe
   if (!fs.existsSync(exe) && !(appDir && fs.existsSync(path.join(appDir, 'BladeForge.exe')))) throw new Error('解压后没找到 BladeForge.exe');
-  return { stage, count, skipped, exe };
+  return { stage, count, skipped, prune, exe };
 }
 
 // 生成替换脚本：等本进程退出 → robocopy 覆盖 → 重启；全程写日志，失败留标记
-function buildUpdateBat(stage, appDir) {
+function buildUpdateBat(stage, appDir, prune) {
   const base = path.join(os.tmpdir(), 'blade-forge-update');
   const log = path.join(base, 'apply.log');
   const failMark = path.join(base, 'fail.txt');
@@ -1005,6 +1031,10 @@ function buildUpdateBat(stage, appDir) {
     '  timeout /t 2 /nobreak >nul',
     '  goto wait',
     ')',
+    'echo [prune] %DATE% %TIME% >>"%LOG%"',
+    'if exist "%SRC%\\_prune.txt" for /f "usebackq delims=" %%L in ("%SRC%\\_prune.txt") do del /f /q "%DST%\\%%L" 2>nul',
+    'echo [locale] %DATE% %TIME% >>"%LOG%"',
+    'for %%F in ("%DST%\\locales\\*.pak") do (echo %%~nxF | findstr /I /R /C:"zh-CN.pak" /C:"zh-TW.pak" /C:"en-US.pak" /C:"en-GB.pak" >nul || del /f /q "%%F")',
     'echo [copy] %DATE% %TIME% >>"%LOG%"',
     'robocopy "%SRC%" "%DST%" /E /MT:16 /R:1 /W:1 /NFL /NDL /NJH /NJS /NP >>"%LOG%" 2>&1',
     'if exist "%DST%\\BladeForge.exe" (',
@@ -1042,7 +1072,7 @@ async function applyUpdateInstall(zipPath, sender) {
     } catch (e) {
       return { ok: false, error: '解压更新包失败：' + String((e && e.message) || e) };
     }
-    const { stage, count, skipped, exe } = staged;
+    let { stage, count, skipped, prune, exe } = staged;
 
     if (process.platform !== 'win32') {
       return { ok: false, error: '自动替换目前只支持 Windows；更新包已解压在临时目录，可以手动替换', stage, count, appDir };
@@ -1051,13 +1081,26 @@ async function applyUpdateInstall(zipPath, sender) {
       return { ok: false, error: '开发模式下不能自动替换，已解压到临时目录供测试', stage, count, appDir };
     }
 
+    // 顺手清掉旧版遗留的多余语言包（新版只带中英繁三个）
+    if (!Array.isArray(prune)) prune = [];
+    try {
+      const loc = path.join(appDir, 'locales');
+      if (fs.existsSync(loc)) {
+        for (const f of fs.readdirSync(loc)) {
+          if (/\.pak$/i.test(f) && !/^(zh-CN|zh-TW|en-US|en-GB)\.pak$/i.test(f)) prune.push('locales/' + f);
+        }
+      }
+    } catch (e) {}
+    if (prune && prune.length) {
+      try { fs.writeFileSync(path.join(updDir(), 'to-prune.json'), JSON.stringify(prune), 'utf8'); } catch (e) {}
+    }
     const base = path.join(os.tmpdir(), 'blade-forge-update');
     const bat = path.join(base, 'ApplyUpdate.bat');
     try {
       fs.rmSync(path.join(base, 'apply.log'), { force: true });
       fs.rmSync(path.join(base, 'fail.txt'), { force: true });
     } catch (_) {}
-    const body = buildUpdateBat(stage, appDir);
+    const body = buildUpdateBat(stage, appDir, prune);
     fs.mkdirSync(base, { recursive: true });
     fs.writeFileSync(bat, body, 'utf8');
 

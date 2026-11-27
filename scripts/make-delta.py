@@ -21,7 +21,7 @@ def main():
     with zipfile.ZipFile(a.old) as zo, zipfile.ZipFile(a.new) as zn:
         ro, rn = root_prefix(zo), root_prefix(zn)
         oldinfo = {n[len(ro):]: i for n, i in ((n, zo.getinfo(n)) for n in zo.namelist()) if not i.is_dir()}
-        changed, same = [], 0
+        changed, same, pruned = [], 0, []
         for n in zn.namelist():
             i = zn.getinfo(n)
             if i.is_dir():
@@ -33,13 +33,23 @@ def main():
                 same += 1
             else:
                 changed.append((n, rel, i))
+        newrel = set()
+        for n in zn.namelist():
+            if not zn.getinfo(n).is_dir():
+                newrel.add(n[len(rn):])
+        pruned = sorted(rel for rel in oldinfo.keys() if rel not in newrel)
         total_sz = sum(i.file_size for _, _, i in changed)
         with zipfile.ZipFile(a.out, 'w', zipfile.ZIP_DEFLATED, compresslevel=9) as out:
             for n, rel, i in changed:
                 out.writestr(n, zn.read(n))
+            if pruned:
+                # 新包里已经删掉的文件：让客户端安装时一并清掉，别留下几十 MB 老文件
+                out.writestr('_prune.txt', '\r\n'.join(x.replace('/', '\\') for x in pruned) + '\r\n')
         import os
         print('变化文件 %d 个 / 未变 %d 个，原文 %.1f MB，delta zip %.1f MB'
               % (len(changed), same, total_sz / 1048576, os.path.getsize(a.out) / 1048576))
+        if pruned:
+            print('待删除的旧文件 %d 个（新增 _prune.txt）' % len(pruned))
         for _, rel, i in changed:
             print('  *', rel, '%.1f MB' % (i.file_size / 1048576))
         if a.json:
