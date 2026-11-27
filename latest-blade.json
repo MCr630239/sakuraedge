@@ -1,9 +1,9 @@
 {
- "version": "0.20.9",
- "url": "https://aka.doubaocdn.com/s/g8ciZLwCye",
- "size": 105232557,
+ "version": "0.20.10",
+ "url": "https://aka.doubaocdn.com/s/A7pgcIznRa",
+ "size": 105234573,
  "channel": "stable",
- "notes": "形状页新增「载入内置原版刀…」按钮，可在当前工程直接替换成 6 把原版刀之一；顶部「原版刀参考」下拉加了说明，它只做叠加比对不改模型。",
+ "notes": "修贴图错位：丢掉整刀转参数化时同步恢复默认分区贴图；整刀模式点「重置贴图」改为恢复该刀的原版贴图。",
  "deltas": [
   {
    "from": "0.19.18",
@@ -54,6 +54,11 @@
    "from": "0.20.8",
    "url": "https://aka.doubaocdn.com/s/Rg64JnU7EV",
    "size": 1138655
+  },
+  {
+   "from": "0.20.9",
+   "url": "https://aka.doubaocdn.com/s/MNFdxNFhl1",
+   "size": 1140674
   }
  ]
 }
