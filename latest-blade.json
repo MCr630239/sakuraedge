@@ -1,14 +1,14 @@
 {
- "version": "0.20.1",
- "url": "https://aka.doubaocdn.com/s/9oZGsEQVw9",
- "size": 105565664,
+ "version": "0.20.2",
+ "url": "https://aka.doubaocdn.com/s/gwnOXrFDZE",
+ "size": 105569539,
  "channel": "stable",
- "notes": "修复：贴图 1×/2×/3× 放大真正生效；调色板可自定义（色板「＋」加色、右键删色、自动记住）；贴图撤销/重做加 Alt+Z / Alt+Shift+Z 快捷键。",
+ "notes": "新建时可选模型：对话框里直接点「内置原版刀」（無銘/「千鹤」村正/散华/夜叉/伪物「鄂门」/魔剑「阎魔刀」）就用原版模型+原版贴图，刀尖方向自动镜像；同页还有「导入自己的 OBJ」。原版刀参考叠加改为镜像+柄尾对齐，新增「对齐尺寸」开关。",
  "deltas": [
   {
-   "from": "0.20.0",
-   "url": "https://aka.doubaocdn.com/s/GCdkhy37WE",
-   "size": 1129679
+   "from": "0.20.1",
+   "url": "https://aka.doubaocdn.com/s/KXXgQc8RVd",
+   "size": 1133554
   }
  ]
 }
