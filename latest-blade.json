@@ -1,14 +1,14 @@
 {
- "version": "0.20.7",
- "url": "https://aka.doubaocdn.com/s/zsu3GT2YSH",
- "size": 105228718,
+ "version": "0.20.8",
+ "url": "https://aka.doubaocdn.com/s/FvcYtUlLYZ",
+ "size": 105231150,
  "channel": "stable",
- "notes": "更新安装器换成隐藏窗口的 PowerShell（wscript 启动），不再出现 cmd 黑窗、不再卡在等待进程；等待旧进程最多 60 秒后直接覆盖。",
+ "notes": "整刀模式下刀模参数置灰并提示「当前是整刀模型：xxx」，附「丢掉整刀，用参数重捏」按钮；提示条显示真实刀名。",
  "deltas": [
   {
-   "from": "0.20.6",
-   "url": "https://aka.doubaocdn.com/s/OonDbQY3qO",
-   "size": 1134819
+   "from": "0.20.7",
+   "url": "https://aka.doubaocdn.com/s/rVFAUni9sN",
+   "size": 1137248
   }
  ]
 }
