@@ -1,14 +1,10 @@
 {
- "version": "0.19.9",
- "url": "https://aka.doubaocdn.com/s/JwpekA6L8P",
- "size": 108909077,
+ "version": "0.19.10",
+ "url": "https://aka.doubaocdn.com/s/qvucPa64mo",
+ "size": 108910522,
  "channel": "stable",
- "notes": "修「检查更新」失败：国内直连 raw.githubusercontent 常被重置（read ECONNRESET），现在会自动依次尝试 gh-proxy / raw / jsDelivr / fastly 四个源，谁通就用谁；也不会再把仓库 release 的工坊版本 1.14.x 误判成建模器新版。",
+ "notes": "视口诊断与取景修复：\n· 「居中」改为按实际模型包围盒取景，参数与模型对不上时也不会把相机拉到看不见东西的地方；\n· 视口操作（居中、自动取景、鼠标抬起）会把相机距离/目标/视口尺寸/模型包围盒/全部参数写进日志目录的 diag.log，出问题点「更新」→「日志」把 diag.log 发来即可定位；\n· 检查更新仍走多源回退（gh-proxy / raw / jsDelivr / fastly）。",
  "deltas": [
-  {
-   "from": "0.19.8",
-   "url": "https://aka.doubaocdn.com/s/8Zrci2QC6S",
-   "size": 4476955
-  }
+  { "from": "0.19.9", "url": "https://aka.doubaocdn.com/s/zqtissUTFZ", "size": 4478606 }
  ]
 }
