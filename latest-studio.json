@@ -1,10 +1,10 @@
 {
- "version": "1.14.18",
- "url": "https://aka.doubaocdn.com/s/AKxoevM6Vi",
- "size": 106159552,
+ "version": "1.14.19",
+ "url": "https://aka.doubaocdn.com/s/aB5ikIG4a1",
+ "size": 105800825,
  "channel": "stable",
- "notes": "与 Blade Forge 0.19.6 配套；同样瘦身（只留四个语言包），增量升级 1.3MB",
+ "notes": "修预览页旋转方向（与建模器一致）；老显卡走软渲染，浏览页不再整片黑；拖过视角后不再自动旋转，重置视角恢复",
  "deltas": [
-  { "from": "1.14.17", "url": "https://aka.doubaocdn.com/s/iwzsI8IZYJ", "size": 1355091 }
+  { "from": "1.14.18", "url": "https://aka.doubaocdn.com/s/3Arxg5GKxO", "size": 1356561 }
  ]
 }
