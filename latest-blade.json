@@ -1,14 +1,14 @@
 {
- "version": "0.19.17",
- "url": "https://aka.doubaocdn.com/s/CUgoAcjVUR",
- "size": 108919521,
+ "version": "0.19.18",
+ "url": "https://aka.doubaocdn.com/s/te4TK2Y9o3",
+ "size": 108920124,
  "channel": "stable",
- "notes": "关窗不再无条件丢东西：顶栏新增「关闭」按钮，「文件」菜单新增「退出程序」，点系统标题栏的 X、Alt+F4 或这两个入口都会先检查有没有没保存的改动——有改动时窗口标题带 ● 提醒，退出前弹窗问一句，按「取消」就留在原处。保存工程、打开工程、新建之后自动清掉脏标记。",
+ "notes": "真·自动更新：启动自动检查，发现新版自动下载、自动重启安装，只在状态栏提示；有未保存改动时先只下载，等你保存后再装。更新面板新增「发现新版自动下载安装」开关（默认开）。",
  "deltas": [
   {
-   "from": "0.19.16",
-   "url": "https://aka.doubaocdn.com/s/pBef5XEAui",
-   "size": 4484721
+   "from": "0.19.17",
+   "url": "https://aka.doubaocdn.com/s/sD3gICA1cv",
+   "size": 4485325
   }
  ]
 }

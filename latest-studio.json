@@ -1,10 +1,14 @@
 {
- "version": "1.14.20",
- "url": "https://aka.doubaocdn.com/s/KjVEEwzhsc",
- "size": 105801262,
+ "version": "1.14.21",
+ "url": "https://aka.doubaocdn.com/s/8qY4GZPOus",
+ "size": 105800789,
  "channel": "stable",
- "notes": "修「检查更新」失败：国内直连 raw.githubusercontent 常被 ECONNRESET，现在自动依次尝试 gh-proxy / raw / jsDelivr / fastly，谁通就用谁。",
+ "notes": "真·自动更新：启动自动检查，发现新版自动下载、自动重启安装；有未保存改动时先只下载，保存后再装。更新面板新增「发现新版自动下载安装」开关（默认开）。",
  "deltas": [
-  { "from": "1.14.19", "url": "https://aka.doubaocdn.com/s/URSLnViEwz", "size": 1357118 }
+  {
+   "from": "1.14.20",
+   "url": "https://aka.doubaocdn.com/s/RhKVET65vR",
+   "size": 1360804
+  }
  ]
 }
