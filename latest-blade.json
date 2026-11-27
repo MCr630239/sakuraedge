@@ -1,11 +1,19 @@
 {
- "version": "0.19.7",
- "url": "https://aka.doubaocdn.com/s/RJNM2U7UNX",
- "size": 108899097,
+ "version": "0.19.8",
+ "url": "https://aka.doubaocdn.com/s/RMh2oe6Ehf",
+ "size": 108898753,
  "channel": "stable",
- "notes": "编辑菜单/附加件新增「添加元素」：方块、圆柱、球、四棱锥、三棱柱、圆锥、圆环七种形状，每件都能改位置（XYZ）、尺寸（长/高/厚）、三轴旋转，贴图区可选刀身/柄/镡/鞘或纯色，做好了直接并进 blade 组导出",
+ "notes": "视口默认换浅色背景（暗色刀贴图在深底上看不清），「视图」菜单可切回深色并记住选择；编辑菜单/附加件里的添加元素同上版：七种形状、位置尺寸三轴旋转、贴图区可选",
  "deltas": [
-  { "from": "0.19.6", "url": "https://aka.doubaocdn.com/s/kjFIGSbxbG", "size": 4467129 },
-  { "from": "0.19.5", "url": "https://aka.doubaocdn.com/s/Xs2fJxTKPW", "size": 4462859 }
+  {
+   "from": "0.19.7",
+   "url": "https://aka.doubaocdn.com/s/CgP0cHYmVL",
+   "size": 4467884
+  },
+  {
+   "from": "0.19.6",
+   "url": "https://aka.doubaocdn.com/s/kjFIGSbxbG",
+   "size": 4467129
+  }
  ]
 }
