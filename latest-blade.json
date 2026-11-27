@@ -1,10 +1,11 @@
 {
- "version": "0.19.6",
- "url": "https://aka.doubaocdn.com/s/ho38Sqs5Rs",
- "size": 109255082,
+ "version": "0.19.7",
+ "url": "https://aka.doubaocdn.com/s/RJNM2U7UNX",
+ "size": 108899097,
  "channel": "stable",
- "notes": "瘦身 15MB：只保留 zh-CN/zh-TW/en-US/en-GB 四个语言包（删掉 51 个，省 38.4MB 磁盘），asar 里去掉与 bundle 重复的 three.js 源码；老版本升级时会自动清掉遗留的多余语言包",
+ "notes": "编辑菜单/附加件新增「添加元素」：方块、圆柱、球、四棱锥、三棱柱、圆锥、圆环七种形状，每件都能改位置（XYZ）、尺寸（长/高/厚）、三轴旋转，贴图区可选刀身/柄/镡/鞘或纯色，做好了直接并进 blade 组导出",
  "deltas": [
+  { "from": "0.19.6", "url": "https://aka.doubaocdn.com/s/kjFIGSbxbG", "size": 4467129 },
   { "from": "0.19.5", "url": "https://aka.doubaocdn.com/s/Xs2fJxTKPW", "size": 4462859 }
  ]
 }
