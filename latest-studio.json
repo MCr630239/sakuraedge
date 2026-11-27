@@ -1,10 +1,10 @@
 {
- "version": "1.14.19",
- "url": "https://aka.doubaocdn.com/s/aB5ikIG4a1",
- "size": 105800825,
+ "version": "1.14.20",
+ "url": "https://aka.doubaocdn.com/s/KjVEEwzhsc",
+ "size": 105801262,
  "channel": "stable",
- "notes": "修预览页旋转方向（与建模器一致）；老显卡走软渲染，浏览页不再整片黑；拖过视角后不再自动旋转，重置视角恢复",
+ "notes": "修「检查更新」失败：国内直连 raw.githubusercontent 常被 ECONNRESET，现在自动依次尝试 gh-proxy / raw / jsDelivr / fastly，谁通就用谁。",
  "deltas": [
-  { "from": "1.14.18", "url": "https://aka.doubaocdn.com/s/3Arxg5GKxO", "size": 1356561 }
+  { "from": "1.14.19", "url": "https://aka.doubaocdn.com/s/URSLnViEwz", "size": 1357118 }
  ]
 }
