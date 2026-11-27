@@ -1,14 +1,14 @@
 {
- "version": "0.20.3",
- "url": "https://aka.doubaocdn.com/s/1UG35noBoX",
- "size": 105061086,
+ "version": "0.20.4",
+ "url": "https://aka.doubaocdn.com/s/0vMZjahVLp",
+ "size": 105061684,
  "channel": "stable",
- "notes": "修复内置原版刀载入后名称停留在「无名刀」，现在自动填充刀名；自动更新安装脚本加超时，避免黑窗卡死。",
+ "notes": "顶部菜单栏改成系统原生菜单（文件/编辑/视图/工具/帮助），去掉网页自绘标题条；检查更新、反馈、关于、渲染开关都进菜单；locales 只留中文包。",
  "deltas": [
   {
-   "from": "0.20.2",
-   "url": "https://aka.doubaocdn.com/s/0R6ejAVeuJ",
-   "size": 1134002
+   "from": "0.20.3",
+   "url": "https://aka.doubaocdn.com/s/280OwekuKs",
+   "size": 1134601
   }
  ]
 }
