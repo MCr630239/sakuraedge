@@ -1,10 +1,10 @@
 {
- "version": "0.19.10",
- "url": "https://aka.doubaocdn.com/s/qvucPa64mo",
- "size": 108910522,
+ "version": "0.19.11",
+ "url": "https://aka.doubaocdn.com/s/aA9HsQ43r4",
+ "size": 108910724,
  "channel": "stable",
- "notes": "视口诊断与取景修复：\n· 「居中」改为按实际模型包围盒取景，参数与模型对不上时也不会把相机拉到看不见东西的地方；\n· 视口操作（居中、自动取景、鼠标抬起）会把相机距离/目标/视口尺寸/模型包围盒/全部参数写进日志目录的 diag.log，出问题点「更新」→「日志」把 diag.log 发来即可定位；\n· 检查更新仍走多源回退（gh-proxy / raw / jsDelivr / fastly）。",
+ "notes": "修贴图面板「笔粗」：滑杆被右侧部件行的勾选框样式压成 13px，几乎拖不动；现在恢复整行宽度，2~26 的笔刷画出来立刻同步到 3D 模型。\n上一版改动保留：居中按实际包围盒取景、视口诊断日志 diag.log、检查更新多源回退。",
  "deltas": [
-  { "from": "0.19.9", "url": "https://aka.doubaocdn.com/s/zqtissUTFZ", "size": 4478606 }
+  { "from": "0.19.10", "url": "https://aka.doubaocdn.com/s/w1ljZfDU2o", "size": 4478801 }
  ]
 }
