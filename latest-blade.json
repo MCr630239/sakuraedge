@@ -1,14 +1,14 @@
 {
- "version": "0.20.2",
- "url": "https://aka.doubaocdn.com/s/gwnOXrFDZE",
- "size": 105569539,
+ "version": "0.20.3",
+ "url": "https://aka.doubaocdn.com/s/XK6SAqEW7B",
+ "size": 105569988,
  "channel": "stable",
- "notes": "新建时可选模型：对话框里直接点「内置原版刀」（無銘/「千鹤」村正/散华/夜叉/伪物「鄂门」/魔剑「阎魔刀」）就用原版模型+原版贴图，刀尖方向自动镜像；同页还有「导入自己的 OBJ」。原版刀参考叠加改为镜像+柄尾对齐，新增「对齐尺寸」开关。",
+ "notes": "修复内置原版刀载入后名称停留在「无名刀」，现在自动填充刀名；自动更新安装脚本加超时，避免黑窗卡死。",
  "deltas": [
   {
-   "from": "0.20.1",
-   "url": "https://aka.doubaocdn.com/s/KXXgQc8RVd",
-   "size": 1133554
+   "from": "0.20.2",
+   "url": "https://aka.doubaocdn.com/s/0R6ejAVeuJ",
+   "size": 1134002
   }
  ]
 }
