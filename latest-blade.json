@@ -6,6 +6,51 @@
  "notes": "形状页新增「载入内置原版刀…」按钮，可在当前工程直接替换成 6 把原版刀之一；顶部「原版刀参考」下拉加了说明，它只做叠加比对不改模型。",
  "deltas": [
   {
+   "from": "0.19.18",
+   "url": "https://aka.doubaocdn.com/s/OXchC7qgVk",
+   "size": 1128591
+  },
+  {
+   "from": "0.20.0",
+   "url": "https://aka.doubaocdn.com/s/GCdkhy37WE",
+   "size": 1129679
+  },
+  {
+   "from": "0.20.1",
+   "url": "https://aka.doubaocdn.com/s/KXXgQc8RVd",
+   "size": 1133554
+  },
+  {
+   "from": "0.20.2",
+   "url": "https://aka.doubaocdn.com/s/0R6ejAVeuJ",
+   "size": 1134002
+  },
+  {
+   "from": "0.20.3",
+   "url": "https://aka.doubaocdn.com/s/280OwekuKs",
+   "size": 1134601
+  },
+  {
+   "from": "0.20.4",
+   "url": "https://aka.doubaocdn.com/s/vvD9xL2rcn",
+   "size": 1299450
+  },
+  {
+   "from": "0.20.5",
+   "url": "https://aka.doubaocdn.com/s/GxYTM6PwtK",
+   "size": 1134961
+  },
+  {
+   "from": "0.20.6",
+   "url": "https://aka.doubaocdn.com/s/OonDbQY3qO",
+   "size": 1134819
+  },
+  {
+   "from": "0.20.7",
+   "url": "https://aka.doubaocdn.com/s/rVFAUni9sN",
+   "size": 1137248
+  },
+  {
    "from": "0.20.8",
    "url": "https://aka.doubaocdn.com/s/Rg64JnU7EV",
    "size": 1138655
