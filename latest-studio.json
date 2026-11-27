@@ -1,14 +1,14 @@
 {
- "version": "1.15.0",
- "url": "https://aka.doubaocdn.com/s/yh6fFxRiOn",
- "size": 106081968,
+ "version": "1.15.1",
+ "url": "https://aka.doubaocdn.com/s/e38xQ9ez76",
+ "size": 106082563,
  "channel": "stable",
- "notes": "大版本：内置模型扩到 7 把并标注是哪把刀（樱刃 katana / 無銘 / 「千鹤」村正 / 散华 / 夜叉 / 伪物「鄂门」 / 魔剑「阎魔刀」），模型卡片写明当前模型；新增「更新日志」按钮。",
+ "notes": "预览视角旋转与 Blade Forge 建模器统一：灵敏度 0.006、垂直范围 ±1.52、初始俯仰一致，默认不自动旋转。",
  "deltas": [
   {
-   "from": "1.14.21",
-   "url": "https://aka.doubaocdn.com/s/nihY8MraHP",
-   "size": 1640508
+   "from": "1.15.0",
+   "url": "https://aka.doubaocdn.com/s/IVfPATApaq",
+   "size": 1641107
   }
  ]
 }
