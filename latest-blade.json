@@ -1,9 +1,9 @@
 {
-  "version": "0.20.39",
-  "url": "https://aka.doubaocdn.com/s/txUEDtCZLG",
-  "size": 109072679,
+  "version": "0.20.40",
+  "url": "https://aka.doubaocdn.com/s/ItpK2gPUfc",
+  "size": 105324529,
   "channel": "stable",
-  "notes": "横向重复按原版实测 4.5077 次：刀身不再是 1.0 次横向拉伸；鞘/柄/镡/effect 仍整图一次。",
+  "notes": "刀身 UV 改逐顶点连续 v（背0.95→刃0.275），去掉 6 段硬台阶造成的彩虹横条；横向仍按原版 4.5077 次。",
   "deltas": [
     {
       "from": "0.20.31",
@@ -171,5 +171,5 @@
       "size": 1211886
     }
   ],
-  "note": "刀身横向重复 = 原版 4.5077 次"
+  "note": "刀身 UV 连续化，去彩虹横条"
 }
