@@ -1,7 +1,7 @@
 {
-  "version": "1.15.9",
-  "url": "https://aka.doubaocdn.com/s/FZZQucqi9f",
-  "size": 106089970,
+  "version": "1.15.10",
+  "url": "https://aka.doubaocdn.com/s/TZG2jg2Yc4",
+  "size": 106090215,
   "channel": "stable",
   "notes": "换贴图时自动校验刀身带接缝隙 Δ，超标提示先在建模器融合边缘。",
   "delta": {
@@ -9,7 +9,7 @@
     "url": "https://aka.doubaocdn.com/s/CMVVW0WdU9",
     "size": 1644283
   },
-  "note": "方鞘 / 图标隐藏 / 鞘口空心",
+  "note": "effect 鞘形发光层 + 实心鞘",
   "deltas": [
     {
       "from": "1.15.6",
@@ -25,6 +25,11 @@
       "from": "1.15.8",
       "url": "https://aka.doubaocdn.com/s/nBvOttSQS9",
       "size": 1649987
+    },
+    {
+      "from": "1.15.9",
+      "url": "https://aka.doubaocdn.com/s/yKI3mUiOB7",
+      "size": 1650231
     }
   ]
 }
