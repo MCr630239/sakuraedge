@@ -1,12 +1,12 @@
 {
- "version": "1.15.4",
- "url": "https://aka.doubaocdn.com/s/NetHWVTPti",
- "size": 106084122,
+ "version": "1.15.5",
+ "url": "https://aka.doubaocdn.com/s/G7tZpoMshO",
+ "size": 106084327,
  "channel": "stable",
- "notes": "刀身 UV 与建模器同步修正；默认贴图重画。",
+ "notes": "开发态不再检查更新。",
  "delta": {
-  "from": "1.15.3",
-  "url": "https://aka.doubaocdn.com/s/TyQsa5W6dS",
-  "size": 1642311
+  "from": "1.15.4",
+  "url": "https://aka.doubaocdn.com/s/WnTwvSngtw",
+  "size": 1642516
  }
 }

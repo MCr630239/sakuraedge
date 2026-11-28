@@ -1,9 +1,9 @@
 {
- "version": "0.20.17",
- "url": "https://aka.doubaocdn.com/s/U6bU8LFOnZ",
- "size": 105239303,
+ "version": "0.20.18",
+ "url": "https://aka.doubaocdn.com/s/Yn2OGWzgf8",
+ "size": 105239973,
  "channel": "stable",
- "notes": "刀身 UV 的 v 改为沿宽度方向 0.25~0.975；贴图面板常显刀身/鞘区域标注。",
+ "notes": "贴图预览条拆成整图/刀身带两排；开发态不再检查更新。",
  "deltas": [
   {
    "from": "0.19.18",
@@ -94,6 +94,11 @@
    "from": "0.20.16",
    "url": "https://aka.doubaocdn.com/s/sF0SNDUPy6",
    "size": 1145080
+  },
+  {
+   "from": "0.20.17",
+   "url": "https://aka.doubaocdn.com/s/fpiSbLJSQ7",
+   "size": 1145751
   }
  ]
 }
