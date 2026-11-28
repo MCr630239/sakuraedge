@@ -1,10 +1,15 @@
 {
-  "version": "0.20.31",
-  "url": "https://aka.doubaocdn.com/s/xe1hXxwFQy",
-  "size": 105363280,
+  "version": "0.20.32",
+  "url": "https://aka.doubaocdn.com/s/i7uM2YpjRp",
+  "size": 105364288,
   "channel": "stable",
-  "notes": "修掉纹理翻转根因：材质统一 flipY=false，与原版 OBJ / Minecraft 的 v 方向一致；截面 v 回到原版实测值（背 1.0 / 宽面 0.8 / 刃面 0.62 / 刃口 0.275）。",
+  "notes": "贴图面板刻度改成部位真实位置（刀背 y0 / 宽面 y51 / 刃面 y97 / 刃口 y186）；新增「翻转V」按钮处理 mqo 转来的反向 UV。",
   "deltas": [
+    {
+      "from": "0.20.31",
+      "url": "https://aka.doubaocdn.com/s/RUTMTt60ZU",
+      "size": 1271079
+    },
     {
       "from": "0.20.30",
       "url": "https://aka.doubaocdn.com/s/xzH9u7XOTU",
@@ -166,5 +171,5 @@
       "size": 1211886
     }
   ],
-  "note": "纹理方向修正"
+  "note": "刻度与部位对齐 + 翻转V"
 }
