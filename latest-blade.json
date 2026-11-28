@@ -1,9 +1,9 @@
 {
-  "version": "0.20.36",
-  "url": "https://aka.doubaocdn.com/s/IcVpPlBUkN",
-  "size": 105369815,
+  "version": "0.20.37",
+  "url": "https://aka.doubaocdn.com/s/aLQ58UZwU0",
+  "size": 105370370,
   "channel": "stable",
-  "notes": "渲染层重构：UV 规则收敛为 uv-rules.js 单一真源，贴图来源统一入口，修正刀身带边界不一致。",
+  "notes": "刀身贴图分区修正：按面取台阶 v，宽度方向 6 段硬台阶，不再整块图铺满刀身。",
   "deltas": [
     {
       "from": "0.20.31",
@@ -171,5 +171,5 @@
       "size": 1211886
     }
   ],
-  "note": "渲染层重构（行为与 0.20.35 一致）"
+  "note": "刀身贴图分区修正"
 }
