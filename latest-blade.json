@@ -1,7 +1,7 @@
 {
-  "version": "0.20.25",
-  "url": "https://aka.doubaocdn.com/s/5fRdpp47xu",
-  "size": 105243424,
+  "version": "0.20.26",
+  "url": "https://aka.doubaocdn.com/s/l9jM56Zyz2",
+  "size": 105244007,
   "channel": "stable",
   "notes": "贴图面板加「锁刀身带」：画笔只在 y 6~191 落笔，不会误涂鞘区。",
   "deltas": [
@@ -134,7 +134,12 @@
       "from": "0.20.24",
       "url": "https://aka.doubaocdn.com/s/xfhb76kbyZ",
       "size": 1150619
+    },
+    {
+      "from": "0.20.25",
+      "url": "https://aka.doubaocdn.com/s/bMnFVEGpQC",
+      "size": 1151203
     }
   ],
-  "note": "物品栏图标按原版结构区分（带鞘/不带鞘）"
+  "note": "默认方鞘 + 物品栏图标组隐藏 + 鞘口空心"
 }
