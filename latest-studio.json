@@ -1,16 +1,21 @@
 {
-  "version": "1.15.11",
-  "url": "https://aka.doubaocdn.com/s/bDkRfC9XZ5",
-  "size": 106092496,
+  "version": "1.15.12",
+  "url": "https://aka.doubaocdn.com/s/0VlAS02itx",
+  "size": 106099170,
   "channel": "stable",
-  "notes": "换贴图时自动校验刀身带接缝隙 Δ，超标提示先在建模器融合边缘。",
+  "notes": "同步建模器的鞘柄 UV 修正。",
   "delta": {
-    "from": "1.15.5",
-    "url": "https://aka.doubaocdn.com/s/CMVVW0WdU9",
-    "size": 1644283
+    "from": "1.15.11",
+    "url": "https://aka.doubaocdn.com/s/4V7v2c9RBW",
+    "size": 1658749
   },
-  "note": "新增启动公告",
+  "note": "鞘柄 UV 修正",
   "deltas": [
+    {
+      "from": "1.15.11",
+      "url": "https://aka.doubaocdn.com/s/4V7v2c9RBW",
+      "size": 1658749
+    },
     {
       "from": "1.15.6",
       "url": "https://aka.doubaocdn.com/s/903NnZ8Xe2",

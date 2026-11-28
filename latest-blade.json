@@ -1,10 +1,15 @@
 {
-  "version": "0.20.29",
-  "url": "https://aka.doubaocdn.com/s/lIYBqU7vz5",
-  "size": 105304692,
+  "version": "0.20.30",
+  "url": "https://aka.doubaocdn.com/s/YeojW91an8",
+  "size": 105348720,
   "channel": "stable",
-  "notes": "贴图面板加「锁刀身带」：画笔只在 y 6~191 落笔，不会误涂鞘区。",
+  "notes": "鞘 / 柄 / 镡的 UV 只取贴图下半 y192~252，柄上不再串刀身花纹；橡皮擦回填与「恢复默认」统一回原版 blade.png。",
   "deltas": [
+    {
+      "from": "0.20.29",
+      "url": "https://aka.doubaocdn.com/s/z4OHMUkswq",
+      "size": 1255513
+    },
     {
       "from": "0.19.18",
       "url": "https://aka.doubaocdn.com/s/OXchC7qgVk",
@@ -156,5 +161,5 @@
       "size": 1211886
     }
   ],
-  "note": "默认贴图改用原版 jar 的 blade.png"
+  "note": "鞘柄 UV 修正"
 }
