@@ -1,9 +1,9 @@
 {
- "version": "0.20.20",
- "url": "https://aka.doubaocdn.com/s/6Ad5VW01mu",
- "size": 105242688,
+ "version": "0.20.21",
+ "url": "https://aka.doubaocdn.com/s/vp6UoaOzCz",
+ "size": 105242968,
  "channel": "stable",
- "notes": "接缝检查新增「拉平边缘」：最右列复制最左列，Δ 归零，可撤销。",
+ "notes": "接缝处理升级为最右 7px 渐变融合到左端颜色（Δ 归零、无硬线）。",
  "deltas": [
   {
    "from": "0.19.18",
@@ -109,6 +109,11 @@
    "from": "0.20.19",
    "url": "https://aka.doubaocdn.com/s/VrxCGIVhqW",
    "size": 1148468
+  },
+  {
+   "from": "0.20.20",
+   "url": "https://aka.doubaocdn.com/s/x3dlp7tdYN",
+   "size": 1148747
   }
  ]
 }
