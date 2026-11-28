@@ -1,7 +1,7 @@
 {
-  "version": "0.20.28",
-  "url": "https://aka.doubaocdn.com/s/vI1bXWBr9G",
-  "size": 105248746,
+  "version": "0.20.29",
+  "url": "https://aka.doubaocdn.com/s/lIYBqU7vz5",
+  "size": 105304692,
   "channel": "stable",
   "notes": "贴图面板加「锁刀身带」：画笔只在 y 6~191 落笔，不会误涂鞘区。",
   "deltas": [
@@ -149,7 +149,12 @@
       "from": "0.20.27",
       "url": "https://aka.doubaocdn.com/s/4QMdADhhV8",
       "size": 1155941
+    },
+    {
+      "from": "0.20.28",
+      "url": "https://aka.doubaocdn.com/s/bEGtVpDzCy",
+      "size": 1211886
     }
   ],
-  "note": "新增启动公告（贴图绘制方法）"
+  "note": "默认贴图改用原版 jar 的 blade.png"
 }
