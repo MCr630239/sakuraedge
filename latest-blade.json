@@ -1,9 +1,9 @@
 {
-  "version": "0.20.38",
-  "url": "https://aka.doubaocdn.com/s/JaLWNindS1",
-  "size": 105370783,
+  "version": "0.20.39",
+  "url": "https://aka.doubaocdn.com/s/txUEDtCZLG",
+  "size": 109072679,
   "channel": "stable",
-  "notes": "按原版源码修正 UV 方向（flipY=false）：刀身改为原版取行，白亮刀刃 + 深灰刀背。",
+  "notes": "横向重复按原版实测 4.5077 次：刀身不再是 1.0 次横向拉伸；鞘/柄/镡/effect 仍整图一次。",
   "deltas": [
     {
       "from": "0.20.31",
@@ -171,5 +171,5 @@
       "size": 1211886
     }
   ],
-  "note": "按原版源码修正 UV 方向"
+  "note": "刀身横向重复 = 原版 4.5077 次"
 }
