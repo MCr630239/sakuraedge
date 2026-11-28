@@ -1,9 +1,9 @@
 {
-  "version": "0.20.37",
-  "url": "https://aka.doubaocdn.com/s/aLQ58UZwU0",
-  "size": 105370370,
+  "version": "0.20.38",
+  "url": "https://aka.doubaocdn.com/s/JaLWNindS1",
+  "size": 105370783,
   "channel": "stable",
-  "notes": "刀身贴图分区修正：按面取台阶 v，宽度方向 6 段硬台阶，不再整块图铺满刀身。",
+  "notes": "按原版源码修正 UV 方向（flipY=false）：刀身改为原版取行，白亮刀刃 + 深灰刀背。",
   "deltas": [
     {
       "from": "0.20.31",
@@ -171,5 +171,5 @@
       "size": 1211886
     }
   ],
-  "note": "刀身贴图分区修正"
+  "note": "按原版源码修正 UV 方向"
 }
