@@ -1,9 +1,9 @@
 {
-  "version": "0.20.33",
-  "url": "https://aka.doubaocdn.com/s/ANJVIxomjO",
-  "size": 105364673,
+  "version": "0.20.35",
+  "url": "https://aka.doubaocdn.com/s/aobxAJv7bu",
+  "size": 105367908,
   "channel": "stable",
-  "notes": "更新方式改为完整包优先（PREFER_FULL_UPDATE=true），不再走增量包，避免新旧 asar 混用。",
+  "notes": "贴图面板「横向重复」滑块 0.2×~4.0×，另加「整图一次」按钮，可按需调整沿刀长的平铺次数。",
   "deltas": [
     {
       "from": "0.20.31",
@@ -171,5 +171,5 @@
       "size": 1211886
     }
   ],
-  "note": "完整更新"
+  "note": "横向重复可调"
 }
