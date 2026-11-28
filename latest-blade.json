@@ -1,10 +1,15 @@
 {
-  "version": "0.20.30",
-  "url": "https://aka.doubaocdn.com/s/YeojW91an8",
-  "size": 105348720,
+  "version": "0.20.31",
+  "url": "https://aka.doubaocdn.com/s/xe1hXxwFQy",
+  "size": 105363280,
   "channel": "stable",
-  "notes": "鞘 / 柄 / 镡的 UV 只取贴图下半 y192~252，柄上不再串刀身花纹；橡皮擦回填与「恢复默认」统一回原版 blade.png。",
+  "notes": "修掉纹理翻转根因：材质统一 flipY=false，与原版 OBJ / Minecraft 的 v 方向一致；截面 v 回到原版实测值（背 1.0 / 宽面 0.8 / 刃面 0.62 / 刃口 0.275）。",
   "deltas": [
+    {
+      "from": "0.20.30",
+      "url": "https://aka.doubaocdn.com/s/xzH9u7XOTU",
+      "size": 1270073
+    },
     {
       "from": "0.20.29",
       "url": "https://aka.doubaocdn.com/s/z4OHMUkswq",
@@ -161,5 +166,5 @@
       "size": 1211886
     }
   ],
-  "note": "鞘柄 UV 修正"
+  "note": "纹理方向修正"
 }

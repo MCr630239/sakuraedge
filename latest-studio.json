@@ -1,16 +1,21 @@
 {
-  "version": "1.15.12",
-  "url": "https://aka.doubaocdn.com/s/0VlAS02itx",
-  "size": 106099170,
+  "version": "1.15.13",
+  "url": "https://aka.doubaocdn.com/s/ZX3kJYPbNR",
+  "size": 106099416,
   "channel": "stable",
-  "notes": "同步建模器的鞘柄 UV 修正。",
+  "notes": "预览贴图 flipY=false，纹理方向与建模器统一。",
   "delta": {
-    "from": "1.15.11",
-    "url": "https://aka.doubaocdn.com/s/4V7v2c9RBW",
-    "size": 1658749
+    "from": "1.15.12",
+    "url": "https://aka.doubaocdn.com/s/5WMUCwcJSP",
+    "size": 1658994
   },
-  "note": "鞘柄 UV 修正",
+  "note": "纹理方向修正",
   "deltas": [
+    {
+      "from": "1.15.12",
+      "url": "https://aka.doubaocdn.com/s/5WMUCwcJSP",
+      "size": 1658994
+    },
     {
       "from": "1.15.11",
       "url": "https://aka.doubaocdn.com/s/4V7v2c9RBW",
