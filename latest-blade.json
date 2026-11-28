@@ -1,9 +1,9 @@
 {
- "version": "0.20.12",
- "url": "https://aka.doubaocdn.com/s/O7tzPl8e9k",
- "size": 105235775,
+ "version": "0.20.13",
+ "url": "https://aka.doubaocdn.com/s/VdYZpVexoK",
+ "size": 105236015,
  "channel": "stable",
- "notes": "参数化刀改用原版 UV 规则：刀身沿长度重复 4.5 次、v 0~0.725，鞘/柄/镡满铺整张贴图；材质开 RepeatWrapping，原版 png 可直接套。",
+ "notes": "默认贴图改为左右无缝整张金属刃面；原版 UV 规则不变（刀身沿长度重复 4.5 次）。",
  "deltas": [
   {
    "from": "0.19.18",
@@ -69,6 +69,11 @@
    "from": "0.20.11",
    "url": "https://aka.doubaocdn.com/s/QGOViYas6C",
    "size": 1141553
+  },
+  {
+   "from": "0.20.12",
+   "url": "https://aka.doubaocdn.com/s/jeUAZoFh0W",
+   "size": 1141794
   }
  ]
 }
