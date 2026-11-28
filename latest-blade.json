@@ -1,129 +1,135 @@
 {
- "version": "0.20.23",
- "url": "https://aka.doubaocdn.com/s/OpO1ZIgv6a",
- "size": 105244265,
- "channel": "stable",
- "notes": "贴图面板加「锁刀身带」：画笔只在 y 6~191 落笔，不会误涂鞘区。",
- "deltas": [
-  {
-   "from": "0.19.18",
-   "url": "https://aka.doubaocdn.com/s/OXchC7qgVk",
-   "size": 1128591
-  },
-  {
-   "from": "0.20.0",
-   "url": "https://aka.doubaocdn.com/s/GCdkhy37WE",
-   "size": 1129679
-  },
-  {
-   "from": "0.20.1",
-   "url": "https://aka.doubaocdn.com/s/KXXgQc8RVd",
-   "size": 1133554
-  },
-  {
-   "from": "0.20.2",
-   "url": "https://aka.doubaocdn.com/s/0R6ejAVeuJ",
-   "size": 1134002
-  },
-  {
-   "from": "0.20.3",
-   "url": "https://aka.doubaocdn.com/s/280OwekuKs",
-   "size": 1134601
-  },
-  {
-   "from": "0.20.4",
-   "url": "https://aka.doubaocdn.com/s/vvD9xL2rcn",
-   "size": 1299450
-  },
-  {
-   "from": "0.20.5",
-   "url": "https://aka.doubaocdn.com/s/GxYTM6PwtK",
-   "size": 1134961
-  },
-  {
-   "from": "0.20.6",
-   "url": "https://aka.doubaocdn.com/s/OonDbQY3qO",
-   "size": 1134819
-  },
-  {
-   "from": "0.20.7",
-   "url": "https://aka.doubaocdn.com/s/rVFAUni9sN",
-   "size": 1137248
-  },
-  {
-   "from": "0.20.8",
-   "url": "https://aka.doubaocdn.com/s/Rg64JnU7EV",
-   "size": 1138655
-  },
-  {
-   "from": "0.20.9",
-   "url": "https://aka.doubaocdn.com/s/MNFdxNFhl1",
-   "size": 1140674
-  },
-  {
-   "from": "0.20.10",
-   "url": "https://aka.doubaocdn.com/s/EM2joa6Y07",
-   "size": 1140842
-  },
-  {
-   "from": "0.20.11",
-   "url": "https://aka.doubaocdn.com/s/QGOViYas6C",
-   "size": 1141553
-  },
-  {
-   "from": "0.20.12",
-   "url": "https://aka.doubaocdn.com/s/jeUAZoFh0W",
-   "size": 1141794
-  },
-  {
-   "from": "0.20.13",
-   "url": "https://aka.doubaocdn.com/s/kU2WNhMbvm",
-   "size": 1142392
-  },
-  {
-   "from": "0.20.14",
-   "url": "https://aka.doubaocdn.com/s/UBfj7q1j6L",
-   "size": 1143691
-  },
-  {
-   "from": "0.20.15",
-   "url": "https://aka.doubaocdn.com/s/496TLcnB5a",
-   "size": 1143526
-  },
-  {
-   "from": "0.20.16",
-   "url": "https://aka.doubaocdn.com/s/sF0SNDUPy6",
-   "size": 1145080
-  },
-  {
-   "from": "0.20.17",
-   "url": "https://aka.doubaocdn.com/s/fpiSbLJSQ7",
-   "size": 1145751
-  },
-  {
-   "from": "0.20.18",
-   "url": "https://aka.doubaocdn.com/s/ZrwAKhiHKm",
-   "size": 1147568
-  },
-  {
-   "from": "0.20.19",
-   "url": "https://aka.doubaocdn.com/s/VrxCGIVhqW",
-   "size": 1148468
-  },
-  {
-   "from": "0.20.20",
-   "url": "https://aka.doubaocdn.com/s/x3dlp7tdYN",
-   "size": 1148747
-  },
-  {
-   "from": "0.20.21",
-   "url": "https://aka.doubaocdn.com/s/hU9AhuKd9P",
-   "size": 1149291
-  },
-  {
-   "from": "0.20.22",
-   "url": "https://aka.doubaocdn.com/s/aiwCmbcvUM",
-   "size": 1150045
-  }
- ]
+  "version": "0.20.24",
+  "url": "https://aka.doubaocdn.com/s/7xmUtchlQs",
+  "size": 105242616,
+  "channel": "stable",
+  "notes": "贴图面板加「锁刀身带」：画笔只在 y 6~191 落笔，不会误涂鞘区。",
+  "deltas": [
+    {
+      "from": "0.19.18",
+      "url": "https://aka.doubaocdn.com/s/OXchC7qgVk",
+      "size": 1128591
+    },
+    {
+      "from": "0.20.0",
+      "url": "https://aka.doubaocdn.com/s/GCdkhy37WE",
+      "size": 1129679
+    },
+    {
+      "from": "0.20.1",
+      "url": "https://aka.doubaocdn.com/s/KXXgQc8RVd",
+      "size": 1133554
+    },
+    {
+      "from": "0.20.2",
+      "url": "https://aka.doubaocdn.com/s/0R6ejAVeuJ",
+      "size": 1134002
+    },
+    {
+      "from": "0.20.3",
+      "url": "https://aka.doubaocdn.com/s/280OwekuKs",
+      "size": 1134601
+    },
+    {
+      "from": "0.20.4",
+      "url": "https://aka.doubaocdn.com/s/vvD9xL2rcn",
+      "size": 1299450
+    },
+    {
+      "from": "0.20.5",
+      "url": "https://aka.doubaocdn.com/s/GxYTM6PwtK",
+      "size": 1134961
+    },
+    {
+      "from": "0.20.6",
+      "url": "https://aka.doubaocdn.com/s/OonDbQY3qO",
+      "size": 1134819
+    },
+    {
+      "from": "0.20.7",
+      "url": "https://aka.doubaocdn.com/s/rVFAUni9sN",
+      "size": 1137248
+    },
+    {
+      "from": "0.20.8",
+      "url": "https://aka.doubaocdn.com/s/Rg64JnU7EV",
+      "size": 1138655
+    },
+    {
+      "from": "0.20.9",
+      "url": "https://aka.doubaocdn.com/s/MNFdxNFhl1",
+      "size": 1140674
+    },
+    {
+      "from": "0.20.10",
+      "url": "https://aka.doubaocdn.com/s/EM2joa6Y07",
+      "size": 1140842
+    },
+    {
+      "from": "0.20.11",
+      "url": "https://aka.doubaocdn.com/s/QGOViYas6C",
+      "size": 1141553
+    },
+    {
+      "from": "0.20.12",
+      "url": "https://aka.doubaocdn.com/s/jeUAZoFh0W",
+      "size": 1141794
+    },
+    {
+      "from": "0.20.13",
+      "url": "https://aka.doubaocdn.com/s/kU2WNhMbvm",
+      "size": 1142392
+    },
+    {
+      "from": "0.20.14",
+      "url": "https://aka.doubaocdn.com/s/UBfj7q1j6L",
+      "size": 1143691
+    },
+    {
+      "from": "0.20.15",
+      "url": "https://aka.doubaocdn.com/s/496TLcnB5a",
+      "size": 1143526
+    },
+    {
+      "from": "0.20.16",
+      "url": "https://aka.doubaocdn.com/s/sF0SNDUPy6",
+      "size": 1145080
+    },
+    {
+      "from": "0.20.17",
+      "url": "https://aka.doubaocdn.com/s/fpiSbLJSQ7",
+      "size": 1145751
+    },
+    {
+      "from": "0.20.18",
+      "url": "https://aka.doubaocdn.com/s/ZrwAKhiHKm",
+      "size": 1147568
+    },
+    {
+      "from": "0.20.19",
+      "url": "https://aka.doubaocdn.com/s/VrxCGIVhqW",
+      "size": 1148468
+    },
+    {
+      "from": "0.20.20",
+      "url": "https://aka.doubaocdn.com/s/x3dlp7tdYN",
+      "size": 1148747
+    },
+    {
+      "from": "0.20.21",
+      "url": "https://aka.doubaocdn.com/s/hU9AhuKd9P",
+      "size": 1149291
+    },
+    {
+      "from": "0.20.22",
+      "url": "https://aka.doubaocdn.com/s/aiwCmbcvUM",
+      "size": 1150045
+    },
+    {
+      "from": "0.20.23",
+      "url": "https://aka.doubaocdn.com/s/7HVDBjdVr4",
+      "size": 1149811
+    }
+  ],
+  "note": "贴图位置按原版 blade.obj 对齐"
 }

@@ -1,12 +1,20 @@
 {
- "version": "1.15.6",
- "url": "https://aka.doubaocdn.com/s/BEJrmtFut9",
- "size": 106086093,
- "channel": "stable",
- "notes": "换贴图时自动校验刀身带接缝隙 Δ，超标提示先在建模器融合边缘。",
- "delta": {
-  "from": "1.15.5",
-  "url": "https://aka.doubaocdn.com/s/CMVVW0WdU9",
-  "size": 1644283
- }
+  "version": "1.15.7",
+  "url": "https://aka.doubaocdn.com/s/vsqRfEIsNW",
+  "size": 106089616,
+  "channel": "stable",
+  "notes": "换贴图时自动校验刀身带接缝隙 Δ，超标提示先在建模器融合边缘。",
+  "delta": {
+    "from": "1.15.5",
+    "url": "https://aka.doubaocdn.com/s/CMVVW0WdU9",
+    "size": 1644283
+  },
+  "note": "自制贴图边缘融合 + UV 对齐",
+  "deltas": [
+    {
+      "from": "1.15.6",
+      "url": "https://aka.doubaocdn.com/s/903NnZ8Xe2",
+      "size": 1649633
+    }
+  ]
 }
