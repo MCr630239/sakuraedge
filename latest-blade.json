@@ -1,9 +1,9 @@
 {
-  "version": "0.20.35",
-  "url": "https://aka.doubaocdn.com/s/aobxAJv7bu",
-  "size": 105367908,
+  "version": "0.20.36",
+  "url": "https://aka.doubaocdn.com/s/IcVpPlBUkN",
+  "size": 105369815,
   "channel": "stable",
-  "notes": "贴图面板「横向重复」滑块 0.2×~4.0×，另加「整图一次」按钮，可按需调整沿刀长的平铺次数。",
+  "notes": "渲染层重构：UV 规则收敛为 uv-rules.js 单一真源，贴图来源统一入口，修正刀身带边界不一致。",
   "deltas": [
     {
       "from": "0.20.31",
@@ -171,5 +171,5 @@
       "size": 1211886
     }
   ],
-  "note": "横向重复可调"
+  "note": "渲染层重构（行为与 0.20.35 一致）"
 }
