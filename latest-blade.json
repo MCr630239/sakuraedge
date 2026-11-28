@@ -1,7 +1,7 @@
 {
-  "version": "0.20.24",
-  "url": "https://aka.doubaocdn.com/s/7xmUtchlQs",
-  "size": 105242616,
+  "version": "0.20.25",
+  "url": "https://aka.doubaocdn.com/s/5fRdpp47xu",
+  "size": 105243424,
   "channel": "stable",
   "notes": "贴图面板加「锁刀身带」：画笔只在 y 6~191 落笔，不会误涂鞘区。",
   "deltas": [
@@ -129,7 +129,12 @@
       "from": "0.20.23",
       "url": "https://aka.doubaocdn.com/s/7HVDBjdVr4",
       "size": 1149811
+    },
+    {
+      "from": "0.20.24",
+      "url": "https://aka.doubaocdn.com/s/xfhb76kbyZ",
+      "size": 1150619
     }
   ],
-  "note": "贴图位置按原版 blade.obj 对齐"
+  "note": "物品栏图标按原版结构区分（带鞘/不带鞘）"
 }
