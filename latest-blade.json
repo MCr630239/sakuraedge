@@ -1,9 +1,9 @@
 {
- "version": "0.20.22",
- "url": "https://aka.doubaocdn.com/s/LfDQ7Mqa3M",
- "size": 105243511,
+ "version": "0.20.23",
+ "url": "https://aka.doubaocdn.com/s/OpO1ZIgv6a",
+ "size": 105244265,
  "channel": "stable",
- "notes": "贴图缩略图右侧标 v 0.975/0.75/0.50/0.25 刻度。",
+ "notes": "贴图面板加「锁刀身带」：画笔只在 y 6~191 落笔，不会误涂鞘区。",
  "deltas": [
   {
    "from": "0.19.18",
@@ -119,6 +119,11 @@
    "from": "0.20.21",
    "url": "https://aka.doubaocdn.com/s/hU9AhuKd9P",
    "size": 1149291
+  },
+  {
+   "from": "0.20.22",
+   "url": "https://aka.doubaocdn.com/s/aiwCmbcvUM",
+   "size": 1150045
   }
  ]
 }
