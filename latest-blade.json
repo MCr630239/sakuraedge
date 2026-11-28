@@ -1,9 +1,9 @@
 {
- "version": "0.20.19",
- "url": "https://aka.doubaocdn.com/s/VruHnwxRF9",
- "size": 105241789,
+ "version": "0.20.20",
+ "url": "https://aka.doubaocdn.com/s/6Ad5VW01mu",
+ "size": 105242688,
  "channel": "stable",
- "notes": "贴图面板新增接缝检查：刀身带左右两端放大拼接 + 色差 Δ 判定。",
+ "notes": "接缝检查新增「拉平边缘」：最右列复制最左列，Δ 归零，可撤销。",
  "deltas": [
   {
    "from": "0.19.18",
@@ -104,6 +104,11 @@
    "from": "0.20.18",
    "url": "https://aka.doubaocdn.com/s/ZrwAKhiHKm",
    "size": 1147568
+  },
+  {
+   "from": "0.20.19",
+   "url": "https://aka.doubaocdn.com/s/VrxCGIVhqW",
+   "size": 1148468
   }
  ]
 }
