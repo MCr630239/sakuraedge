@@ -1,9 +1,9 @@
 {
-  "version": "0.20.32",
-  "url": "https://aka.doubaocdn.com/s/i7uM2YpjRp",
-  "size": 105364288,
+  "version": "0.20.33",
+  "url": "https://aka.doubaocdn.com/s/ANJVIxomjO",
+  "size": 105364673,
   "channel": "stable",
-  "notes": "贴图面板刻度改成部位真实位置（刀背 y0 / 宽面 y51 / 刃面 y97 / 刃口 y186）；新增「翻转V」按钮处理 mqo 转来的反向 UV。",
+  "notes": "更新方式改为完整包优先（PREFER_FULL_UPDATE=true），不再走增量包，避免新旧 asar 混用。",
   "deltas": [
     {
       "from": "0.20.31",
@@ -171,5 +171,5 @@
       "size": 1211886
     }
   ],
-  "note": "刻度与部位对齐 + 翻转V"
+  "note": "完整更新"
 }

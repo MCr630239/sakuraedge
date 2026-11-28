@@ -1,15 +1,15 @@
 {
-  "version": "1.15.14",
-  "url": "https://aka.doubaocdn.com/s/x4Ypx3P2Uw",
-  "size": 106099440,
+  "version": "1.15.15",
+  "url": "https://aka.doubaocdn.com/s/T3NrOUdnAZ",
+  "size": 106099855,
   "channel": "stable",
-  "notes": "预览贴图方向回到原版。",
+  "notes": "更新方式改为完整包优先。",
   "delta": {
     "from": "1.15.13",
     "url": "https://aka.doubaocdn.com/s/yzGIBVPCyD",
     "size": 1659019
   },
-  "note": "方向恢复",
+  "note": "完整更新",
   "deltas": [
     {
       "from": "1.15.13",
