@@ -1,9 +1,9 @@
 {
- "version": "0.20.16",
- "url": "https://aka.doubaocdn.com/s/w48o6oUUOU",
- "size": 105237747,
+ "version": "0.20.17",
+ "url": "https://aka.doubaocdn.com/s/U6bU8LFOnZ",
+ "size": 105239303,
  "channel": "stable",
- "notes": "修「永远整包更新」：实时清单源优先、内嵌快照兜底。",
+ "notes": "刀身 UV 的 v 改为沿宽度方向 0.25~0.975；贴图面板常显刀身/鞘区域标注。",
  "deltas": [
   {
    "from": "0.19.18",
@@ -89,6 +89,11 @@
    "from": "0.20.15",
    "url": "https://aka.doubaocdn.com/s/496TLcnB5a",
    "size": 1143526
+  },
+  {
+   "from": "0.20.16",
+   "url": "https://aka.doubaocdn.com/s/sF0SNDUPy6",
+   "size": 1145080
   }
  ]
 }

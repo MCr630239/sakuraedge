@@ -1,12 +1,12 @@
 {
- "version": "1.15.3",
- "url": "https://aka.doubaocdn.com/s/eCg85WDAUy",
- "size": 106083824,
+ "version": "1.15.4",
+ "url": "https://aka.doubaocdn.com/s/NetHWVTPti",
+ "size": 106084122,
  "channel": "stable",
- "notes": "修「永远整包更新」：实时清单源优先、内嵌快照兜底。",
+ "notes": "刀身 UV 与建模器同步修正；默认贴图重画。",
  "delta": {
-  "from": "1.15.2",
-  "url": "https://aka.doubaocdn.com/s/bQ8ZQ4En5l",
-  "size": 1642014
+  "from": "1.15.3",
+  "url": "https://aka.doubaocdn.com/s/TyQsa5W6dS",
+  "size": 1642311
  }
 }
