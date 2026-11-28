@@ -1,9 +1,9 @@
 {
- "version": "0.20.13",
- "url": "https://aka.doubaocdn.com/s/VdYZpVexoK",
- "size": 105236015,
+ "version": "0.20.14",
+ "url": "https://aka.doubaocdn.com/s/NNVI2aya3X",
+ "size": 105236613,
  "channel": "stable",
- "notes": "默认贴图改为左右无缝整张金属刃面；原版 UV 规则不变（刀身沿长度重复 4.5 次）。",
+ "notes": "贴图面板新增横向重复预览（4.5× 拼接 + 接缝标记）；默认贴图左右无缝，原版 UV 规则不变。",
  "deltas": [
   {
    "from": "0.19.18",
@@ -74,6 +74,11 @@
    "from": "0.20.12",
    "url": "https://aka.doubaocdn.com/s/jeUAZoFh0W",
    "size": 1141794
+  },
+  {
+   "from": "0.20.13",
+   "url": "https://aka.doubaocdn.com/s/kU2WNhMbvm",
+   "size": 1142392
   }
  ]
 }
