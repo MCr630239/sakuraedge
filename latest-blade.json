@@ -1,9 +1,9 @@
 {
- "version": "0.20.14",
- "url": "https://aka.doubaocdn.com/s/NNVI2aya3X",
- "size": 105236613,
+ "version": "0.20.15",
+ "url": "https://aka.doubaocdn.com/s/iM3Dj7PVt6",
+ "size": 105237912,
  "channel": "stable",
- "notes": "贴图面板新增横向重复预览（4.5× 拼接 + 接缝标记）；默认贴图左右无缝，原版 UV 规则不变。",
+ "notes": "贴图面板新增「新建模板」一键铺 128×256 无缝金属底；开发态不再触发自动更新。",
  "deltas": [
   {
    "from": "0.19.18",
@@ -79,6 +79,11 @@
    "from": "0.20.13",
    "url": "https://aka.doubaocdn.com/s/kU2WNhMbvm",
    "size": 1142392
+  },
+  {
+   "from": "0.20.14",
+   "url": "https://aka.doubaocdn.com/s/UBfj7q1j6L",
+   "size": 1143691
   }
  ]
 }
