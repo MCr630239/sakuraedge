@@ -1,12 +1,12 @@
 {
- "version": "1.15.2",
- "url": "https://aka.doubaocdn.com/s/sV5zqsHysV",
- "size": 106083545,
+ "version": "1.15.3",
+ "url": "https://aka.doubaocdn.com/s/eCg85WDAUy",
+ "size": 106083824,
  "channel": "stable",
- "notes": "与建模器统一原版 UV；预览贴图 RepeatWrapping；默认贴图无缝金属刃面。",
+ "notes": "修「永远整包更新」：实时清单源优先、内嵌快照兜底。",
  "delta": {
-  "from": "1.15.1",
-  "url": "https://aka.doubaocdn.com/s/X9UOpvJk8o",
-  "size": 1641735
+  "from": "1.15.2",
+  "url": "https://aka.doubaocdn.com/s/bQ8ZQ4En5l",
+  "size": 1642014
  }
 }
